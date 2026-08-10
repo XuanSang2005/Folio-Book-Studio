@@ -23,18 +23,22 @@ async function render() {
   );
 }
 
-test("server-renders the Folio identity experience", async () => {
+test("server-renders the Folio studio entry experience", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
   assert.match(html, /<title>Gradion \/ Folio — Book Illustration Studio<\/title>/i);
-  assert.match(html, /Turn prose/);
-  assert.match(html, /into plates/);
-  assert.match(html, /Use sample identity/);
-  assert.match(html, /five-stage studio/i);
+  assert.match(html, /Return to/);
+  assert.match(html, /the folio/);
+  assert.match(html, /Enter the studio/);
+  assert.match(html, /Use the sample library/);
+  assert.match(html, /PROTOTYPE IDENTITY/);
+  assert.match(html, /FULL NAME/i);
+  assert.match(html, /EMAIL/i);
   assert.match(html, /og\.png/);
+  assert.doesNotMatch(html, /type="password"/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Your site is taking shape/i);
 });
 
@@ -56,6 +60,9 @@ test("prototype source covers the required product states", async () => {
     "1 OF 1 SLOT USED",
     "Upload",
     "Sign out",
+    "aria-invalid",
+    "nameInputRef",
+    "emailInputRef",
   ]) {
     assert.match(page, new RegExp(requirement, "i"));
   }

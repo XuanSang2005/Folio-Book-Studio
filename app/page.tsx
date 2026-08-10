@@ -41,7 +41,7 @@ type Project = {
   portraitProgress: number;
 };
 
-const STORAGE_KEY = "gradion-folio-prototype-v1";
+const STORAGE_KEY = "gradion-folio-prototype-v2";
 
 const STEPS = [
   {
@@ -189,8 +189,8 @@ function formatDate(value: string) {
 
 export default function BookStudioPrototype() {
   const [view, setView] = useState<View>("identity");
-  const [userName, setUserName] = useState("Xuan Sang");
-  const [userEmail, setUserEmail] = useState("sang@example.com");
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [identityError, setIdentityError] = useState("");
   const [projects, setProjects] = useState<Project[]>(SEED_PROJECTS);
   const [activeProjectId, setActiveProjectId] = useState("riverbank");
@@ -207,6 +207,9 @@ export default function BookStudioPrototype() {
   const [hydrated, setHydrated] = useState(false);
   const timersRef = useRef<number[]>([]);
   const modalReturnFocus = useRef<HTMLElement | null>(null);
+  const overlayCloseRef = useRef<HTMLButtonElement | null>(null);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
 
   const activeProject = useMemo(
     () => projects.find((project) => project.id === activeProjectId) ?? projects[0],
@@ -214,33 +217,37 @@ export default function BookStudioPrototype() {
   );
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const snapshot = JSON.parse(stored) as {
-          projects?: Project[];
-          userName?: string;
-          userEmail?: string;
-          activeProjectId?: string;
-          view?: View;
-        };
-        if (snapshot.projects?.length) {
-          setProjects(
-            snapshot.projects.map((project) => ({
-              ...project,
-              ownerEmail: project.ownerEmail ?? "sang@example.com",
-            })),
-          );
+    const hydrationTimer = window.setTimeout(() => {
+      try {
+        const stored = window.localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const snapshot = JSON.parse(stored) as {
+            projects?: Project[];
+            userName?: string;
+            userEmail?: string;
+            activeProjectId?: string;
+            view?: View;
+          };
+          if (snapshot.projects?.length) {
+            setProjects(
+              snapshot.projects.map((project) => ({
+                ...project,
+                ownerEmail: project.ownerEmail ?? "sang@example.com",
+              })),
+            );
+          }
+          if (snapshot.userName) setUserName(snapshot.userName);
+          if (snapshot.userEmail) setUserEmail(snapshot.userEmail);
+          if (snapshot.activeProjectId) setActiveProjectId(snapshot.activeProjectId);
+          if (snapshot.view && snapshot.view !== "identity") setView(snapshot.view);
         }
-        if (snapshot.userName) setUserName(snapshot.userName);
-        if (snapshot.userEmail) setUserEmail(snapshot.userEmail);
-        if (snapshot.activeProjectId) setActiveProjectId(snapshot.activeProjectId);
-        if (snapshot.view && snapshot.view !== "identity") setView(snapshot.view);
+      } catch {
+        // A corrupt prototype snapshot simply falls back to the curated seed data.
       }
-    } catch {
-      // A corrupt prototype snapshot simply falls back to the curated seed data.
-    }
-    setHydrated(true);
+      setHydrated(true);
+    }, 0);
+
+    return () => window.clearTimeout(hydrationTimer);
   }, []);
 
   useEffect(() => {
@@ -263,6 +270,12 @@ export default function BookStudioPrototype() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   });
+
+  useEffect(() => {
+    if (!manuscriptOpen && !lightbox) return;
+    const focusTimer = window.setTimeout(() => overlayCloseRef.current?.focus(), 0);
+    return () => window.clearTimeout(focusTimer);
+  }, [lightbox, manuscriptOpen]);
 
   function schedule(callback: () => void, delay: number) {
     timersRef.current.push(window.setTimeout(callback, delay));
@@ -289,12 +302,20 @@ export default function BookStudioPrototype() {
 
   function submitIdentity(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!userName.trim() || !/^\S+@\S+\.\S+$/.test(userEmail.trim())) {
-      setIdentityError("Enter your name and a valid email to continue.");
+    if (!userName.trim()) {
+      setIdentityError("Enter your full name to continue.");
+      nameInputRef.current?.focus();
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(userEmail.trim())) {
+      setIdentityError("Enter a valid email address to continue.");
+      emailInputRef.current?.focus();
       return;
     }
     setIdentityError("");
-    setEmptyLibrary(userEmail.trim().toLowerCase() !== "sang@example.com");
+    setUserName(userName.trim());
+    setUserEmail(userEmail.trim().toLowerCase());
+    setEmptyLibrary(false);
     setView("library");
   }
 
@@ -533,75 +554,104 @@ export default function BookStudioPrototype() {
   }
 
   function renderIdentity() {
+    const nameInvalid = Boolean(identityError && !userName.trim());
+    const emailInvalid = Boolean(identityError && !/^\S+@\S+\.\S+$/.test(userEmail.trim()));
+
     return (
-      <main className="identity-page">
-        <div className="identity-topline">
-          <span>GRADION / FOLIO</span>
-          <span>BOOK ILLUSTRATION STUDIO · EST. MMXXVI</span>
-        </div>
-        <section className="identity-grid">
-          <div className="identity-copy">
-            <p className="kicker">THE VISUAL WORLD INSIDE EVERY BOOK</p>
+      <main className="login-page">
+        <aside className="login-editorial">
+          <div className="login-wordmark" aria-label="Gradion Folio">
+            <span>GRADION /</span>
+            <strong>Folio</strong>
+            <small>BOOK ILLUSTRATION STUDIO</small>
+          </div>
+
+          <div className="login-story">
+            <p className="kicker">FIG. 01 — STUDIO ENTRY</p>
             <h1>
-              Turn prose
-              <em> into plates.</em>
+              <span>Return to </span>
+              <em>the folio</em>
+              <span>.</span>
             </h1>
-            <p className="identity-lede">
-              A deliberate, five-stage studio for shaping manuscripts into art direction,
-              character portraits, and one consistent final scene.
-            </p>
-            <div className="identity-index" aria-label="Five-stage pipeline summary">
+            <blockquote>
+              <p>“The studio remembers every direction, portrait and plate. Return, and the volume continues where you left it.”</p>
+              <cite>— EDITORIAL NOTE, VOL. II</cite>
+            </blockquote>
+            <ol className="login-stage-index" aria-label="Five-stage illustration pipeline">
               {STEPS.map((step) => (
-                <span key={step.roman}>
-                  <b>{step.roman}</b> {step.label}
-                </span>
+                <li key={step.roman}><b>{step.roman}</b>{step.label}</li>
               ))}
-            </div>
+            </ol>
           </div>
-          <div className="identity-visual">
-            <img src="/og.png" alt="An open editorial folio with two portrait plates and a coastal chapter illustration" />
-            <span className="plate-caption">SPECIMEN № 001 · THE ILLUSTRATED VOLUME</span>
+
+          <div className="login-admission-seal" aria-hidden="true">
+            <span>STUDIO</span>
+            <strong>№ 05</strong>
+            <em>est.</em>
+            <span>MMXXVI</span>
           </div>
-          <form className="identity-form" onSubmit={submitIdentity} noValidate>
-            <div className="form-heading">
-              <span className="section-number">00</span>
-              <div>
-                <p className="kicker">STUDIO ACCESS</p>
-                <h2>Begin or resume.</h2>
-              </div>
-            </div>
-            <label className="field">
-              <span>Full name</span>
-              <input
-                value={userName}
-                onChange={(event) => setUserName(event.target.value)}
-                autoComplete="name"
-                placeholder="Xuan Sang"
-                aria-describedby={identityError ? "identity-error" : undefined}
-              />
-            </label>
-            <label className="field">
-              <span>Email</span>
-              <input
-                value={userEmail}
-                onChange={(event) => setUserEmail(event.target.value)}
-                autoComplete="email"
-                type="email"
-                placeholder="sang@example.com"
-                aria-describedby={identityError ? "identity-error" : undefined}
-              />
-            </label>
-            {identityError ? <p className="inline-error" id="identity-error">{identityError}</p> : null}
-            <button className="primary-button full" type="submit">
-              Enter the studio <span aria-hidden="true">→</span>
-            </button>
-            <button className="secondary-button full" type="button" onClick={useSampleIdentity}>
-              Use sample identity
-            </button>
-            <p className="form-note">
-              No password. Returning email addresses resume their volumes exactly where they left off.
+          <div className="login-register-mark register-one" aria-hidden="true"><i /><i /></div>
+          <div className="login-register-mark register-two" aria-hidden="true"><i /><i /></div>
+        </aside>
+
+        <section className="login-entry">
+          <div className="login-entry-inner">
+            <p className="kicker">ENTRY FORM · IDENTITY</p>
+            <h2>Enter the studio.</h2>
+            <p className="login-entry-lede">
+              Use your name and email to begin a library or resume an existing volume.
             </p>
-          </form>
+
+            <form className="login-form" onSubmit={submitIdentity} noValidate aria-label="Studio identity">
+              <label className="field login-field">
+                <span>Full name</span>
+                <input
+                  ref={nameInputRef}
+                  id="studio-name"
+                  name="name"
+                  value={userName}
+                  onChange={(event) => { setUserName(event.target.value); setIdentityError(""); }}
+                  autoComplete="name"
+                  placeholder="Xuan Sang"
+                  required
+                  aria-invalid={nameInvalid}
+                  aria-describedby={identityError ? "identity-error" : "login-identity-note"}
+                />
+              </label>
+              <label className="field login-field">
+                <span>Email</span>
+                <input
+                  ref={emailInputRef}
+                  id="studio-email"
+                  name="email"
+                  value={userEmail}
+                  onChange={(event) => { setUserEmail(event.target.value); setIdentityError(""); }}
+                  autoComplete="email"
+                  type="email"
+                  placeholder="you@domain.com"
+                  required
+                  aria-invalid={emailInvalid}
+                  aria-describedby={identityError ? "identity-error" : "login-identity-note"}
+                />
+              </label>
+              {identityError ? <p className="inline-error" id="identity-error" role="alert">{identityError}</p> : null}
+              <button className="primary-button login-submit" type="submit">
+                Enter <span aria-hidden="true">→</span>
+              </button>
+            </form>
+
+            <div className="login-sample">
+              <p>Reviewing the prototype?</p>
+              <button type="button" onClick={useSampleIdentity}>
+                Use the sample library <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="login-entry-footer" id="login-identity-note">
+            <span>PROTOTYPE IDENTITY · NO PASSWORD</span>
+            <p>New email addresses create a private, empty library. Returning addresses resume saved work.</p>
+          </div>
         </section>
       </main>
     );
@@ -938,7 +988,7 @@ export default function BookStudioPrototype() {
       {manuscriptOpen && activeProject ? (
         <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeOverlay()}>
           <section className="manuscript-modal" role="dialog" aria-modal="true" aria-labelledby="manuscript-title">
-            <header><div><p className="kicker">SOURCE MANUSCRIPT · READ-ONLY</p><h2 id="manuscript-title">{activeProject.title}</h2></div><button className="modal-close" onClick={closeOverlay} autoFocus aria-label="Close manuscript">×</button></header>
+            <header><div><p className="kicker">SOURCE MANUSCRIPT · READ-ONLY</p><h2 id="manuscript-title">{activeProject.title}</h2></div><button ref={overlayCloseRef} className="modal-close" onClick={closeOverlay} aria-label="Close manuscript">×</button></header>
             <div className="manuscript-copy"><span className="drop-cap">{activeProject.bookText.trim()[0]}</span>{activeProject.bookText.trim().slice(1)}</div>
             <footer><span>{wordCount(activeProject.bookText).toLocaleString()} WORDS</span><span>FULL TEXT REMAINS AVAILABLE AT EVERY STAGE</span></footer>
           </section>
@@ -948,7 +998,7 @@ export default function BookStudioPrototype() {
       {lightbox ? (
         <div className="modal-backdrop lightbox-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeOverlay()}>
           <section className="lightbox" role="dialog" aria-modal="true" aria-label={lightbox}>
-            <button className="modal-close lightbox-close" onClick={closeOverlay} autoFocus aria-label="Close image">×</button>
+            <button ref={overlayCloseRef} className="modal-close lightbox-close" onClick={closeOverlay} aria-label="Close image">×</button>
             <div className={lightbox.includes("Final") ? "chapter-art ready lightbox-art" : `portrait-art ${lightbox.includes("Ratty") ? "portrait-2" : "portrait-1"} ready lightbox-art`}>
               {lightbox.includes("Final") ? <><span className="sun-disc" /><span className="river-line river-one" /><span className="river-line river-two" /><span className="bank bank-left" /><span className="bank bank-right" /><span className="figure figure-one" /><span className="figure figure-two" /></> : <><span className="portrait-halo" /><span className="portrait-head" /><span className="portrait-body" /></>}
             </div>
