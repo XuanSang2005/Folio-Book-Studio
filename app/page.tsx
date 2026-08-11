@@ -943,17 +943,28 @@ export default function BookStudioPrototype() {
                   <p className="kicker" id="commission-title-heading">NAME THE EDITION</p>
                   <label className="field field-large" htmlFor="new-volume-title">
                     <span>Volume title</span>
-                    <input
-                      ref={newTitleInputRef}
-                      id="new-volume-title"
-                      name="volumeTitle"
-                      required
-                      aria-invalid={titleInvalid}
-                      aria-describedby={titleInvalid ? "new-title-error" : "volume-title-note"}
-                      value={newTitle}
-                      onChange={(event) => { setNewTitle(event.target.value); if (newTitleError) setNewTitleError(""); }}
-                      placeholder="The Secret Garden — Illustrated Edition"
-                    />
+                    <span className={`title-input-row${titleInvalid ? " invalid" : ""}`}>
+                      <input
+                        ref={newTitleInputRef}
+                        id="new-volume-title"
+                        name="volumeTitle"
+                        required
+                        aria-invalid={titleInvalid}
+                        aria-describedby={titleInvalid ? "new-title-error" : "volume-title-note"}
+                        value={newTitle}
+                        onChange={(event) => { setNewTitle(event.target.value); if (newTitleError) setNewTitleError(""); }}
+                        placeholder="The Secret Garden — Illustrated Edition"
+                      />
+                      <img
+                        className="title-field-mascot"
+                        src="/illustrations/folio-mascot.png"
+                        alt=""
+                        aria-hidden="true"
+                        width="386"
+                        height="512"
+                        decoding="async"
+                      />
+                    </span>
                   </label>
                   <p className="panel-note" id="volume-title-note">Use the title that should appear in your working library.</p>
                   {titleInvalid ? <p className="inline-error" id="new-title-error" role="alert">{newTitleError}</p> : null}

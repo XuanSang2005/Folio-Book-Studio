@@ -78,6 +78,8 @@ test("prototype source covers the required product states", async () => {
     "commission-actions",
     "commission-desk",
     "pipeline-ledger",
+    "title-input-row",
+    "folio-mascot.png",
     "Upload manuscript",
     "source-dialog",
     "aria-haspopup=\"dialog\"",
@@ -100,4 +102,6 @@ test("prototype source covers the required product states", async () => {
   assert.doesNotMatch(page, /account-seal/);
   assert.doesNotMatch(page, /Google Drive|Slack/);
   assert.match(styles, /folio-diptych-v1\.jpg/i);
+  assert.match(styles, /\.commission-input-grid\s*\{[^}]*align-items:\s*stretch;[^}]*grid-template-columns:\s*repeat\(2,/s);
+  assert.match(styles, /\.pipeline-ledger\s*>\s*header\s*\{[^}]*border-bottom:\s*0;/s);
 });
