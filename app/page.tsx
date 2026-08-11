@@ -536,14 +536,6 @@ export default function BookStudioPrototype() {
           </button>
         </nav>
         <div className="account-block">
-          <span className="account-seal" aria-hidden="true">
-            {userName
-              .split(" ")
-              .map((part) => part[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase()}
-          </span>
           <span className="account-name">{userName}</span>
           <button className="text-link" onClick={signOut}>Sign out</button>
         </div>

@@ -73,4 +73,5 @@ test("prototype source covers the required product states", async () => {
   }
 
   assert.doesNotMatch(page, /edition-strip|INTERACTIVE PROTOTYPE|EDITION № 01/);
+  assert.doesNotMatch(page, /account-seal/);
 });

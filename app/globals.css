@@ -624,7 +624,7 @@ a:focus-visible {
   z-index: 30;
   top: 0;
   display: grid;
-  min-height: 78px;
+  min-height: 84px;
   align-items: center;
   padding: 12px clamp(18px, 3.2vw, 54px);
   border-bottom: 1px solid var(--rule);
@@ -646,26 +646,26 @@ a:focus-visible {
 .wordmark-prefix {
   color: var(--gradion-dark);
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.09em;
 }
 
 .wordmark-title {
   font-family: var(--display);
-  font-size: 34px;
+  font-size: 38px;
   font-weight: 400;
   letter-spacing: -0.025em;
 }
 
 .masthead-nav {
   display: flex;
-  gap: 38px;
+  gap: 42px;
 }
 
 .nav-link {
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 550;
   letter-spacing: 0.01em;
 }
@@ -674,30 +674,17 @@ a:focus-visible {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
-}
-
-.account-seal {
-  display: inline-grid;
-  width: 35px;
-  height: 35px;
-  place-items: center;
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  color: var(--paper);
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  gap: 18px;
 }
 
 .account-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 550;
 }
 
 .account-block .text-link {
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .page-shell {
@@ -2497,7 +2484,7 @@ a:focus-visible {
   }
 
   .wordmark-title {
-    font-size: 29px;
+    font-size: 32px;
   }
 
   .masthead {
