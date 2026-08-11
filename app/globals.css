@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #f2ecdf;
+  --paper: #efe7d8;
   --paper-soft: #f8f4eb;
   --paper-bright: #fffdf8;
   --ink: #1c1b18;
@@ -628,7 +628,7 @@ a:focus-visible {
   align-items: center;
   padding: 12px clamp(18px, 3.2vw, 54px);
   border-bottom: 1px solid var(--rule);
-  background: rgba(242, 236, 223, 0.96);
+  background: rgba(239, 231, 216, 0.96);
   backdrop-filter: blur(12px);
   grid-template-columns: 1fr auto 1fr;
 }
