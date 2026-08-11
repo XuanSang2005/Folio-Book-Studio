@@ -713,6 +713,10 @@ a:focus-visible {
   font-size: clamp(62px, 6.2vw, 102px);
 }
 
+.library-intro h1 em {
+  margin-left: clamp(86px, 8vw, 150px);
+}
+
 .library-feature-plate {
   position: relative;
   height: auto;
@@ -2404,6 +2408,10 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .library-intro h1 em {
+    margin-left: clamp(56px, 8vw, 82px);
+  }
+
   .ledger-head {
     display: none;
   }
@@ -2525,6 +2533,10 @@ a:focus-visible {
   .library-intro h1,
   .new-project-header h1 {
     font-size: clamp(54px, 18vw, 82px);
+  }
+
+  .library-intro h1 em {
+    margin-left: clamp(18px, 6vw, 46px);
   }
 
   .wordmark-prefix {
