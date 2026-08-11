@@ -564,16 +564,6 @@ export default function BookStudioPrototype() {
             <small>BOOK ILLUSTRATION STUDIO</small>
           </div>
 
-          <figure className="login-plate-gallery" aria-hidden="true">
-            {[
-              "/illustrations/riverbank.webp",
-              "/illustrations/frankenstein.webp",
-              "/illustrations/dorian-gray.webp",
-            ].map((src) => (
-              <span key={src}><img src={src} alt="" width="490" height="976" decoding="async" /></span>
-            ))}
-          </figure>
-
           <div className="login-story">
             <p className="kicker">FIG. 01 — STUDIO ENTRY</p>
             <h1>
