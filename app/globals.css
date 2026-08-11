@@ -1133,11 +1133,10 @@ a:focus-visible {
 }
 
 .new-project-header h1 {
-  max-width: none;
+  max-width: 12ch;
   margin: 0 auto;
   font-size: clamp(64px, 6.5vw, 108px);
   line-height: 0.92;
-  white-space: nowrap;
 }
 
 .new-project-header h1 em {
@@ -2788,7 +2787,6 @@ a:focus-visible {
 
   .new-project-header h1 {
     font-size: clamp(48px, 14vw, 64px);
-    white-space: normal;
   }
 
   .wordmark-prefix {
