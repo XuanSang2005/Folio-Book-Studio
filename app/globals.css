@@ -1115,8 +1115,8 @@ a:focus-visible {
 .new-project-header {
   display: grid;
   column-gap: clamp(14px, 1.7vw, 28px);
-  row-gap: clamp(28px, 3vw, 46px);
-  padding: clamp(44px, 4vw, 64px) 0 52px;
+  row-gap: clamp(20px, 2vw, 30px);
+  padding: clamp(36px, 3.4vw, 52px) 0 40px;
   border-bottom: 1px solid var(--rule-dark);
   grid-template-columns: 44px repeat(11, minmax(0, 1fr));
 }
@@ -1210,20 +1210,22 @@ a:focus-visible {
   background-color: #d8cdb9;
   background-image: url("/illustrations/folio-triptych.webp");
   background-repeat: no-repeat;
-  background-size: 310% auto;
   box-shadow: 0 10px 24px rgba(44, 36, 27, 0.1);
 }
 
 .proof-card-one .proof-art {
-  background-position: left 51%;
+  background-position: 3% 31%;
+  background-size: 328% auto;
 }
 
 .proof-card-two .proof-art {
-  background-position: center 49%;
+  background-position: 50% 29%;
+  background-size: 338% auto;
 }
 
 .proof-card-three .proof-art {
-  background-position: right 51%;
+  background-position: 97% 30%;
+  background-size: 330% auto;
 }
 
 .proof-label {
@@ -1264,8 +1266,8 @@ a:focus-visible {
 }
 
 .new-project-intro {
-  align-self: end;
-  padding: 0 0 18px 24px;
+  align-self: start;
+  padding: 2px 0 0 24px;
   border-left: 2px solid var(--gradion);
   grid-column: 9 / -1;
   grid-row: 1;
@@ -1273,7 +1275,7 @@ a:focus-visible {
 
 .new-project-standfirst {
   max-width: 15ch;
-  margin: 0 0 17px;
+  margin: 0 0 12px;
   font-family: var(--display);
   font-size: clamp(28px, 2.5vw, 39px);
   font-weight: 400;
@@ -1292,16 +1294,17 @@ a:focus-visible {
 .new-project-facts {
   display: grid;
   align-self: end;
+  margin-bottom: clamp(12px, 1.4vw, 22px);
   border-top: 1px solid var(--rule-dark);
   grid-column: 9 / -1;
-  grid-row: 2;
+  grid-row: 1;
 }
 
 .new-project-facts > div {
   display: grid;
   align-items: baseline;
   gap: 12px;
-  padding: 11px 0;
+  padding: 9px 0;
   border-bottom: 1px solid var(--rule);
   grid-template-columns: minmax(108px, 0.8fr) minmax(0, 1.2fr);
 }
@@ -2598,6 +2601,11 @@ a:focus-visible {
     grid-template-columns: minmax(0, 0.95fr) minmax(500px, 1.05fr);
   }
 
+  .new-project-facts {
+    margin-bottom: 0;
+    grid-row: 2;
+  }
+
   .commission-form {
     gap: 48px;
     grid-template-columns: minmax(0, 1fr) 320px;
@@ -2686,8 +2694,8 @@ a:focus-visible {
 
   .new-project-header {
     column-gap: 14px;
-    row-gap: 32px;
-    padding: 42px 0 44px;
+    row-gap: 24px;
+    padding: 36px 0;
     grid-template-columns: 32px repeat(7, minmax(0, 1fr));
   }
 
@@ -2718,6 +2726,7 @@ a:focus-visible {
 
   .new-project-facts {
     align-self: start;
+    margin-bottom: 0;
     grid-column: 6 / -1;
     grid-row: 3;
   }
@@ -2942,8 +2951,8 @@ a:focus-visible {
   }
 
   .new-project-header {
-    row-gap: 18px;
-    padding: 28px 0 30px;
+    row-gap: 14px;
+    padding: 24px 0;
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -2975,8 +2984,19 @@ a:focus-visible {
     gap: 6px;
   }
 
-  .proof-art {
-    background-size: 335% auto;
+  .proof-card-one .proof-art {
+    background-position: 4% 28%;
+    background-size: 350% auto;
+  }
+
+  .proof-card-two .proof-art {
+    background-position: 50% 27%;
+    background-size: 350% auto;
+  }
+
+  .proof-card-three .proof-art {
+    background-position: 96% 28%;
+    background-size: 350% auto;
   }
 
   .proof-label {
@@ -2996,10 +3016,12 @@ a:focus-visible {
 
   .new-project-standfirst {
     max-width: 18ch;
+    margin-bottom: 10px;
     font-size: 28px;
   }
 
   .new-project-facts {
+    margin-bottom: 0;
     border-bottom: 1px solid var(--rule);
     grid-row: 4;
     grid-template-columns: repeat(3, minmax(0, 1fr));
