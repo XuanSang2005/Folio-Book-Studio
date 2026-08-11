@@ -955,15 +955,25 @@ export default function BookStudioPrototype() {
                         onChange={(event) => { setNewTitle(event.target.value); if (newTitleError) setNewTitleError(""); }}
                         placeholder="The Secret Garden — Illustrated Edition"
                       />
-                      <img
-                        className="title-field-mascot"
-                        src="/illustrations/folio-mascot.png"
-                        alt=""
-                        aria-hidden="true"
-                        width="386"
-                        height="512"
-                        decoding="async"
-                      />
+                      {!newTitle ? (
+                        <picture className="title-field-mascot">
+                          <source
+                            srcSet="/illustrations/folio-mascot-animated.webp"
+                            type="image/webp"
+                            media="(prefers-reduced-motion: no-preference)"
+                          />
+                          <img
+                            src="/illustrations/folio-mascot.png"
+                            alt=""
+                            aria-hidden="true"
+                            width="109"
+                            height="144"
+                            loading="lazy"
+                            decoding="async"
+                            fetchPriority="low"
+                          />
+                        </picture>
+                      ) : null}
                     </span>
                   </label>
                   <p className="panel-note" id="volume-title-note">Use the title that should appear in your working library.</p>

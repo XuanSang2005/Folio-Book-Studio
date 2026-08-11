@@ -80,6 +80,8 @@ test("prototype source covers the required product states", async () => {
     "pipeline-ledger",
     "title-input-row",
     "folio-mascot.png",
+    "folio-mascot-animated.webp",
+    "prefers-reduced-motion: no-preference",
     "Upload manuscript",
     "source-dialog",
     "aria-haspopup=\"dialog\"",

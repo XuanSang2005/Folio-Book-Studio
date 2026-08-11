@@ -1441,16 +1441,22 @@ a:focus-visible {
   width: 100%;
   height: 72px;
   align-self: end;
-  object-fit: contain;
-  object-position: center bottom;
   pointer-events: none;
   user-select: none;
-  transition: opacity 160ms var(--ease), transform 160ms var(--ease);
+  transition: opacity 220ms var(--ease), transform 220ms var(--ease);
+}
+
+.title-field-mascot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
 }
 
 .title-input-row input:not(:placeholder-shown) + .title-field-mascot {
   opacity: 0;
-  transform: translateY(4px) scale(0.92);
+  transform: translateY(2px) scale(0.96);
 }
 
 .commission-panel .field input[aria-invalid="true"] {
