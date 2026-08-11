@@ -45,6 +45,7 @@ test("server-renders the Folio studio entry experience", async () => {
 
 test("prototype source covers the required product states", async () => {
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
   for (const requirement of [
     "Art direction",
@@ -70,10 +71,10 @@ test("prototype source covers the required product states", async () => {
     "PLATE I · THE RIVERBANK",
     "NEW VOLUME · SOURCE TEXT",
     "new-project-proof",
-    "new-project-index",
     "proof-card-two",
-    "new-project-brief",
-    "COMMISSION BRIEF",
+    "proof-card-four",
+    "proof-card-five",
+    "PLATES I–V",
     "commission-actions",
     "newTitleInputRef",
     "newTextInputRef",
@@ -87,4 +88,5 @@ test("prototype source covers the required product states", async () => {
 
   assert.doesNotMatch(page, /edition-strip|INTERACTIVE PROTOTYPE|EDITION № 01/);
   assert.doesNotMatch(page, /account-seal/);
+  assert.match(styles, /folio-diptych-v1\.jpg/i);
 });

@@ -773,11 +773,6 @@ export default function BookStudioPrototype() {
     return (
       <main className="page-shell new-project-page">
         <section className="new-project-header">
-          <div className="new-project-index" aria-hidden="true">
-            <span>COMMISSION 01</span>
-            <i />
-            <span>FOLIO / SOURCE</span>
-          </div>
           <header className="new-project-title">
             <p className="kicker">NEW VOLUME · SOURCE TEXT</p>
             <h1>Begin a <em>new volume.</em></h1>
@@ -786,7 +781,7 @@ export default function BookStudioPrototype() {
             <div
               className="new-project-proof-grid"
               role="img"
-              aria-label="Three ornate reference plates showing a riverbank story, a gothic laboratory, and a Victorian portrait studio"
+              aria-label="Five ornate reference plates showing a riverbank story, a gothic laboratory, a Victorian portrait studio, a moonlit observatory, and a botanical conservatory"
             >
               <div className="proof-card proof-card-one">
                 <span className="proof-art" aria-hidden="true" />
@@ -800,24 +795,17 @@ export default function BookStudioPrototype() {
                 <span className="proof-art" aria-hidden="true" />
                 <span className="proof-label"><b>III</b> Portrait study</span>
               </div>
+              <div className="proof-card proof-card-four">
+                <span className="proof-art" aria-hidden="true" />
+                <span className="proof-label"><b>IV</b> Observatory study</span>
+              </div>
+              <div className="proof-card proof-card-five">
+                <span className="proof-art" aria-hidden="true" />
+                <span className="proof-label"><b>V</b> Botanical study</span>
+              </div>
             </div>
-            <figcaption><span>REFERENCE PROOF</span><strong>PLATES I–III · VISUAL RANGE</strong></figcaption>
+            <figcaption><span>REFERENCE PROOF</span><strong>PLATES I–V · VISUAL RANGE</strong></figcaption>
           </figure>
-          <aside className="new-project-brief" aria-labelledby="new-project-brief-title">
-            <div className="new-project-intro">
-              <p className="kicker">COMMISSION BRIEF · 01</p>
-              <h2 className="new-project-standfirst" id="new-project-brief-title">One manuscript. A whole visual world.</h2>
-              <p className="new-project-lede">
-                Provide the complete text once. Folio carries the same source through five
-                deliberate stages, with every retry left in your hands.
-              </p>
-            </div>
-            <dl className="new-project-facts" aria-label="Commission parameters">
-              <div><dt>SOURCE</dt><dd>Plain text · UTF-8</dd></div>
-              <div><dt>WORKFLOW</dt><dd>Five deliberate stages</dd></div>
-              <div><dt>CONTROL</dt><dd>Manual retries only</dd></div>
-            </dl>
-          </aside>
         </section>
 
         <form className="commission-form" onSubmit={createProject} noValidate>
