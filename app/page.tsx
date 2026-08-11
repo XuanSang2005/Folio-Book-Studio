@@ -665,29 +665,27 @@ export default function BookStudioPrototype() {
     return (
       <main className="page-shell library-page">
         <section className="library-intro">
-          <div>
+          <div className="library-intro-heading">
             <p className="kicker">THE WORKING LIBRARY · {new Date().getFullYear()}</p>
             <h1>Your volumes,<br /><em>in progress.</em></h1>
-          </div>
-          <div className="library-intro-copy">
-            <figure className="library-feature-plate">
-              <img
-                src="/illustrations/riverbank.webp"
-                alt="Illustrated Riverbank plate featuring Mole and Ratty beside a blue boat"
-                width="486"
-                height="976"
-                decoding="async"
-              />
-              <figcaption>PLATE I · THE RIVERBANK</figcaption>
-            </figure>
             <div className="library-intro-action">
               <p>
-                Good afternoon, {userName.split(" ")[0]}. Each volume preserves its manuscript,
-                visual direction, cast, and every generated plate.
+                Good afternoon, {userName.split(" ")[0]}. Your manuscripts, visual direction,
+                cast, and generated plates stay together here.
               </p>
               <button className="primary-button" onClick={() => setView("new")}>Commission a new volume <span aria-hidden="true">→</span></button>
             </div>
           </div>
+          <figure className="library-feature-plate">
+            <img
+              src="/illustrations/riverbank.webp"
+              alt="Illustrated Riverbank plate featuring Mole and Ratty beside a blue boat"
+              width="486"
+              height="976"
+              decoding="async"
+            />
+            <figcaption>PLATE I · THE RIVERBANK</figcaption>
+          </figure>
         </section>
 
         <section className="ledger-summary" aria-label="Library summary">
