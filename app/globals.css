@@ -1278,19 +1278,16 @@ a:focus-visible {
 
 .commission-desk {
   position: relative;
-  overflow: hidden;
-  border: 1px solid var(--rule-dark);
-  background: rgba(248, 244, 235, 0.58);
-  box-shadow: 0 24px 70px rgba(44, 36, 27, 0.08);
+  border-top: 1px solid var(--rule-dark);
 }
 
 .commission-desk::before {
   position: absolute;
   z-index: 2;
   top: 0;
-  right: 0;
   left: 0;
-  height: 4px;
+  width: 76px;
+  height: 3px;
   background: var(--gradion);
   content: "";
 }
@@ -1299,7 +1296,7 @@ a:focus-visible {
   display: grid;
   align-items: end;
   gap: clamp(32px, 5vw, 80px);
-  padding: clamp(28px, 3.2vw, 44px);
+  padding: clamp(28px, 3vw, 40px) clamp(8px, 1vw, 16px) clamp(30px, 3.2vw, 44px);
   grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.7fr);
 }
 
@@ -1307,7 +1304,7 @@ a:focus-visible {
   max-width: 18ch;
   margin: 10px 0 0;
   font-family: var(--display);
-  font-size: clamp(36px, 3.5vw, 50px);
+  font-size: clamp(34px, 3vw, 44px);
   font-weight: 400;
   letter-spacing: -0.025em;
   line-height: 1.02;
@@ -1329,36 +1326,44 @@ a:focus-visible {
 
 .commission-input-grid {
   display: grid;
-  border-top: 1px solid var(--rule-dark);
-  border-bottom: 1px solid var(--rule-dark);
+  align-items: start;
+  gap: 24px;
+  padding-top: 2px;
   grid-template-columns: minmax(0, 6fr) minmax(0, 7fr);
 }
 
 .commission-panel {
-  display: grid;
+  position: relative;
   min-width: 0;
-  min-height: 292px;
-  grid-template-columns: 88px minmax(0, 1fr);
+  min-height: 286px;
+  overflow: hidden;
+  border: 1px solid rgba(159, 150, 135, 0.72);
+  border-radius: 12px;
+  background: rgba(248, 244, 235, 0.56);
+  box-shadow: 0 14px 34px rgba(44, 36, 27, 0.045);
 }
 
 .commission-panel + .commission-panel {
-  border-left: 1px solid var(--rule-dark);
+  border-left: 1px solid rgba(159, 150, 135, 0.72);
 }
 
 .commission-panel-index {
+  position: absolute;
+  z-index: 1;
+  top: 24px;
+  right: 28px;
+  left: 28px;
   display: flex;
   align-items: center;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 27px 15px;
-  border-right: 1px solid var(--rule);
-  background: rgba(230, 95, 42, 0.065);
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
 }
 
 .commission-panel-index span {
   color: var(--gradion-dark);
   font-family: var(--display);
-  font-size: 44px;
+  font-size: 27px;
   font-weight: 400;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -1370,12 +1375,16 @@ a:focus-visible {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  writing-mode: vertical-rl;
 }
 
 .commission-panel-body {
   min-width: 0;
-  padding: clamp(26px, 3vw, 40px);
+  padding: 76px clamp(26px, 3vw, 40px) clamp(28px, 3vw, 38px);
+}
+
+.source-panel {
+  margin-top: 24px;
+  background: rgba(185, 134, 53, 0.045);
 }
 
 .commission-panel-body > .kicker {
@@ -1385,7 +1394,7 @@ a:focus-visible {
 .field-large input {
   padding: 8px 0 14px;
   font-family: var(--display);
-  font-size: clamp(28px, 2.5vw, 39px);
+  font-size: clamp(27px, 2.2vw, 36px);
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -1442,6 +1451,7 @@ a:focus-visible {
   gap: 18px;
   padding: 20px 22px;
   border-left: 4px solid var(--gradion);
+  border-radius: 8px;
   background: var(--ink);
   color: var(--paper-bright);
   cursor: pointer;
@@ -1452,7 +1462,7 @@ a:focus-visible {
 }
 
 .source-upload-trigger:hover {
-  background: var(--midnight);
+  background: var(--gradion-dark);
   transform: translateY(-1px);
 }
 
@@ -1479,8 +1489,9 @@ a:focus-visible {
   align-items: center;
   gap: 20px;
   padding: 20px;
-  border: 1px solid rgba(69, 89, 72, 0.48);
-  background: rgba(220, 225, 215, 0.58);
+  border: 1px solid rgba(164, 58, 22, 0.28);
+  border-radius: 10px;
+  background: rgba(185, 134, 53, 0.1);
   grid-template-columns: 58px minmax(0, 1fr) auto;
 }
 
@@ -1489,7 +1500,7 @@ a:focus-visible {
   width: 54px;
   height: 68px;
   place-items: center;
-  border: 1px solid var(--moss);
+  border: 1px solid var(--gradion-dark);
   color: var(--gradion-dark);
   font-family: var(--mono);
   font-size: 11px;
@@ -1504,7 +1515,7 @@ a:focus-visible {
 }
 
 .source-receipt-copy small {
-  color: var(--success);
+  color: var(--gradion-dark);
   font-family: var(--mono);
   font-size: 10px;
   font-weight: 600;
@@ -1543,8 +1554,14 @@ a:focus-visible {
 }
 
 .pipeline-ledger {
-  background: var(--midnight);
-  color: var(--paper-bright);
+  overflow: hidden;
+  margin-top: 18px;
+  border: 1px solid rgba(164, 58, 22, 0.22);
+  border-radius: 14px;
+  background:
+    linear-gradient(130deg, rgba(185, 134, 53, 0.14), rgba(164, 58, 22, 0.055)),
+    rgba(239, 231, 216, 0.82);
+  color: var(--ink);
 }
 
 .pipeline-ledger > header {
@@ -1553,11 +1570,11 @@ a:focus-visible {
   justify-content: space-between;
   gap: 30px;
   padding: 25px 30px 22px;
-  border-bottom: 1px solid rgba(248, 244, 235, 0.22);
+  border-bottom: 1px solid rgba(164, 58, 22, 0.18);
 }
 
 .pipeline-ledger .kicker {
-  color: rgba(248, 244, 235, 0.62);
+  color: var(--ink-soft);
 }
 
 .pipeline-ledger h3 {
@@ -1571,7 +1588,7 @@ a:focus-visible {
 
 .pipeline-ledger > header > p {
   margin: 0;
-  color: rgba(248, 244, 235, 0.6);
+  color: var(--ink-soft);
   font-family: var(--mono);
   font-size: 10px;
   font-weight: 600;
@@ -1580,29 +1597,26 @@ a:focus-visible {
 
 .pipeline-ledger ol {
   display: grid;
+  gap: 18px;
   margin: 0;
-  padding: 0;
+  padding: 0 30px 28px;
   list-style: none;
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .pipeline-ledger li {
   display: grid;
-  min-height: 126px;
+  min-height: 88px;
   align-content: space-between;
   gap: 12px;
-  padding: 20px 22px;
-  border-right: 1px solid rgba(248, 244, 235, 0.2);
-}
-
-.pipeline-ledger li:last-child {
-  border-right: 0;
+  padding: 14px 0 0;
+  border-top: 1px solid rgba(164, 58, 22, 0.2);
 }
 
 .pipeline-ledger li > span {
-  color: #ff8053;
+  color: var(--gradion-dark);
   font-family: var(--display);
-  font-size: 31px;
+  font-size: 27px;
   font-style: italic;
   line-height: 1;
 }
@@ -1619,7 +1633,7 @@ a:focus-visible {
 }
 
 .pipeline-ledger li small {
-  color: rgba(248, 244, 235, 0.58);
+  color: var(--ink-soft);
   font-size: 12px;
 }
 
@@ -1628,8 +1642,9 @@ a:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 28px;
-  padding: 24px 30px;
-  background: rgba(220, 225, 215, 0.36);
+  margin-top: 18px;
+  padding: 24px 8px 0;
+  border-top: 1px solid var(--rule);
 }
 
 .commission-readiness {
@@ -1637,7 +1652,7 @@ a:focus-visible {
 }
 
 .commission-readiness.ready span {
-  color: var(--success);
+  color: var(--gradion-dark);
 }
 
 .commission-readiness p {
@@ -2736,14 +2751,14 @@ a:focus-visible {
 }
 
 .source-method.selected {
-  border-color: var(--midnight);
+  border-color: var(--gradion);
   border-top: 3px solid var(--gradion);
-  background: var(--midnight);
-  color: var(--paper-bright);
+  background: rgba(230, 95, 42, 0.09);
+  color: var(--ink);
 }
 
 .source-method.selected small {
-  color: rgba(248, 244, 235, 0.64);
+  color: var(--ink-soft);
 }
 
 .source-method > span {
@@ -2900,7 +2915,12 @@ a:focus-visible {
 
 @media (max-width: 1160px) {
   .commission-input-grid {
+    gap: 14px;
     grid-template-columns: 1fr;
+  }
+
+  .source-panel {
+    margin-top: 0;
   }
 
   .commission-panel {
@@ -2908,8 +2928,7 @@ a:focus-visible {
   }
 
   .commission-panel + .commission-panel {
-    border-top: 1px solid var(--rule-dark);
-    border-left: 0;
+    border-left: 1px solid rgba(159, 150, 135, 0.72);
   }
 }
 
@@ -3328,19 +3347,21 @@ a:focus-visible {
 
   .commission-panel {
     min-height: 0;
-    grid-template-columns: 58px minmax(0, 1fr);
   }
 
   .commission-panel-index {
-    padding: 20px 10px;
+    top: 18px;
+    right: 20px;
+    left: 20px;
+    padding: 0 0 8px;
   }
 
   .commission-panel-index span {
-    font-size: 34px;
+    font-size: 25px;
   }
 
   .commission-panel-body {
-    padding: 24px 20px 28px;
+    padding: 68px 20px 28px;
   }
 
   .commission-panel-body > .kicker {
@@ -3394,14 +3415,14 @@ a:focus-visible {
   }
 
   .pipeline-ledger li {
-    min-height: 116px;
-    padding: 18px;
+    min-height: 96px;
+    padding: 14px 0 0;
   }
 
   .commission-actions {
     align-items: stretch;
     flex-direction: column;
-    padding: 22px;
+    padding: 22px 0 0;
   }
 
   .commission-actions .primary-button {
@@ -3548,14 +3569,13 @@ a:focus-visible {
 }
 
 @media (max-width: 480px) {
-  .commission-panel {
-    grid-template-columns: 1fr;
-  }
-
   .commission-panel-index {
+    top: 16px;
+    right: 18px;
+    left: 18px;
     align-items: center;
     flex-direction: row;
-    padding: 10px 16px;
+    padding: 0 0 8px;
     border-right: 0;
     border-bottom: 1px solid var(--rule);
   }
@@ -3569,7 +3589,11 @@ a:focus-visible {
   }
 
   .commission-panel-body {
-    padding: 22px 18px 26px;
+    padding: 66px 18px 26px;
+  }
+
+  .pipeline-ledger > header > p {
+    display: none;
   }
 
   .source-receipt-actions {
