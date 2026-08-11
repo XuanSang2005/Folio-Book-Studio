@@ -772,26 +772,48 @@ export default function BookStudioPrototype() {
 
     return (
       <main className="page-shell new-project-page">
-        <button className="back-link" onClick={() => setView("library")}>← Return to the library</button>
         <section className="new-project-header">
+          <div className="new-project-index" aria-hidden="true">
+            <span>COMMISSION 01</span>
+            <i />
+            <span>FOLIO / SOURCE</span>
+          </div>
           <div className="new-project-title">
             <p className="kicker">NEW VOLUME · SOURCE TEXT</p>
-            <h1>Begin a<br /><em>new volume.</em></h1>
-            <div className="new-project-facts" aria-label="Commission parameters">
-              <div><span>SOURCE</span><strong>TXT / UTF-8</strong></div>
-              <div><span>WORKFLOW</span><strong>V STAGES</strong></div>
-              <div><span>RETRIES</span><strong>MANUAL ONLY</strong></div>
-            </div>
+            <h1>Begin a <em>new volume.</em></h1>
           </div>
+          <figure className="new-project-proof">
+            <div
+              className="new-project-proof-grid"
+              role="img"
+              aria-label="Three ornate reference plates showing a riverbank story, a gothic laboratory, and a Victorian portrait studio"
+            >
+              <div className="proof-card proof-card-one">
+                <span className="proof-art" aria-hidden="true" />
+                <span className="proof-label"><b>I</b> Riverbank study</span>
+              </div>
+              <div className="proof-card proof-card-two">
+                <span className="proof-art" aria-hidden="true" />
+                <span className="proof-label"><b>II</b> Gothic study</span>
+              </div>
+              <div className="proof-card proof-card-three">
+                <span className="proof-art" aria-hidden="true" />
+                <span className="proof-label"><b>III</b> Portrait study</span>
+              </div>
+            </div>
+            <figcaption><span>REFERENCE PROOF</span><strong>PLATES I–III · VISUAL RANGE</strong></figcaption>
+          </figure>
           <div className="new-project-intro">
-            <figure className="new-project-plate">
-              <img src="/illustrations/folio-triptych.webp" alt="Three ornate reference plates for riverbank, gothic, and portrait editions" width="1536" height="1024" decoding="async" />
-              <figcaption>REFERENCE FOLIO · PLATES I–III</figcaption>
-            </figure>
-            <p>
+            <p className="new-project-standfirst">One manuscript becomes a visual world.</p>
+            <p className="new-project-lede">
               Give the studio one complete manuscript. We’ll carry the same source through all
               five illustration stages—uploaded once, never duplicated.
             </p>
+          </div>
+          <div className="new-project-facts" role="group" aria-label="Commission parameters">
+            <div><span>01 / SOURCE</span><strong>PLAIN TEXT · UTF-8</strong></div>
+            <div><span>02 / WORKFLOW</span><strong>FIVE DELIBERATE STAGES</strong></div>
+            <div><span>03 / RETRIES</span><strong>MANUAL CONTROL ONLY</strong></div>
           </div>
         </section>
 
