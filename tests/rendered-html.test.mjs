@@ -76,6 +76,16 @@ test("prototype source covers the required product states", async () => {
     "proof-card-five",
     "PLATES I–V",
     "commission-actions",
+    "commission-desk",
+    "pipeline-ledger",
+    "Upload manuscript",
+    "source-dialog",
+    "aria-haspopup=\"dialog\"",
+    "sourceModalOpen",
+    "source-drop-zone",
+    "accept=\".txt,text/plain\"",
+    "Text input",
+    "aria-live=\"polite\"",
     "newTitleInputRef",
     "newTextInputRef",
     "newFileInputRef",
@@ -88,5 +98,6 @@ test("prototype source covers the required product states", async () => {
 
   assert.doesNotMatch(page, /edition-strip|INTERACTIVE PROTOTYPE|EDITION № 01/);
   assert.doesNotMatch(page, /account-seal/);
+  assert.doesNotMatch(page, /Google Drive|Slack/);
   assert.match(styles, /folio-diptych-v1\.jpg/i);
 });

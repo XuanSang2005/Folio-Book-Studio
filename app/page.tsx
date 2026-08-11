@@ -14,6 +14,7 @@ import {
 type View = "identity" | "library" | "new" | "studio";
 type StepState = "idle" | "running" | "failed" | "stuck";
 type DemoOutcome = "normal" | "fail" | "stuck";
+type SourceMode = "upload" | "paste";
 
 type Character = {
   name: string;
@@ -215,15 +216,25 @@ export default function BookStudioPrototype() {
   const [newTitleError, setNewTitleError] = useState("");
   const [newManuscriptError, setNewManuscriptError] = useState("");
   const [newFileError, setNewFileError] = useState("");
+  const [sourceModalOpen, setSourceModalOpen] = useState(false);
+  const [sourceMode, setSourceMode] = useState<SourceMode>("upload");
+  const [sourceDraft, setSourceDraft] = useState("");
+  const [sourceDragActive, setSourceDragActive] = useState(false);
+  const [sourceModalError, setSourceModalError] = useState("");
   const [hydrated, setHydrated] = useState(false);
   const timersRef = useRef<number[]>([]);
   const modalReturnFocus = useRef<HTMLElement | null>(null);
   const overlayCloseRef = useRef<HTMLButtonElement | null>(null);
+  const overlayDialogRef = useRef<HTMLElement | null>(null);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const newTitleInputRef = useRef<HTMLInputElement | null>(null);
   const newTextInputRef = useRef<HTMLTextAreaElement | null>(null);
   const newFileInputRef = useRef<HTMLInputElement | null>(null);
+  const sourceTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const sourceDropButtonRef = useRef<HTMLButtonElement | null>(null);
+  const sourceReplaceRef = useRef<HTMLButtonElement | null>(null);
+  const focusSourceReceiptAfterCloseRef = useRef(false);
 
   const activeProject = useMemo(
     () => projects.find((project) => project.id === activeProjectId) ?? projects[0],
@@ -277,19 +288,54 @@ export default function BookStudioPrototype() {
   }, []);
 
   useEffect(() => {
-    if (!manuscriptOpen && !lightbox) return;
+    if (!manuscriptOpen && !lightbox && !sourceModalOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeOverlay();
+      if (event.key === "Escape") {
+        closeOverlay();
+        return;
+      }
+      if (event.key !== "Tab" || !overlayDialogRef.current) return;
+      const focusable = Array.from(
+        overlayDialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]):not(.source-file-input), textarea:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => !element.hasAttribute("hidden"));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
   useEffect(() => {
-    if (!manuscriptOpen && !lightbox) return;
-    const focusTimer = window.setTimeout(() => overlayCloseRef.current?.focus(), 0);
+    if (!manuscriptOpen && !lightbox && !sourceModalOpen) return;
+    const focusTimer = window.setTimeout(() => {
+      if (sourceModalOpen) {
+        if (sourceMode === "paste") newTextInputRef.current?.focus();
+        else sourceDropButtonRef.current?.focus();
+        return;
+      }
+      overlayCloseRef.current?.focus();
+    }, 0);
     return () => window.clearTimeout(focusTimer);
-  }, [lightbox, manuscriptOpen]);
+  }, [lightbox, manuscriptOpen, sourceModalOpen, sourceMode]);
+
+  useEffect(() => {
+    if (!manuscriptOpen && !lightbox && !sourceModalOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [lightbox, manuscriptOpen, sourceModalOpen]);
 
   function schedule(callback: () => void, delay: number) {
     timersRef.current.push(window.setTimeout(callback, delay));
@@ -338,6 +384,7 @@ export default function BookStudioPrototype() {
     setView("identity");
     setManuscriptOpen(false);
     setLightbox(null);
+    setSourceModalOpen(false);
   }
 
   function openProject(id: string) {
@@ -347,29 +394,54 @@ export default function BookStudioPrototype() {
   }
 
   async function readFile(file?: File) {
-    if (!file) return;
+    if (!file) return false;
     if (!file.name.toLowerCase().endsWith(".txt")) {
-      setNewFileError("Please choose a plain .txt manuscript.");
-      return;
+      setSourceModalError("Please choose a plain .txt manuscript.");
+      return false;
     }
-    const text = await file.text();
+    let text = "";
+    try {
+      text = await file.text();
+    } catch {
+      setSourceModalError("We could not read that file. Choose another manuscript.");
+      return false;
+    }
     if (!text.trim()) {
-      setNewFileError("That file is empty. Choose another manuscript.");
-      return;
+      setSourceModalError("That file is empty. Choose another manuscript.");
+      return false;
     }
     setFileName(file.name);
     setNewText(text);
+    setSourceModalError("");
     setNewFileError("");
     setNewManuscriptError("");
+    return true;
   }
 
   function onFileChange(event: ChangeEvent<HTMLInputElement>) {
-    void readFile(event.target.files?.[0]);
+    const input = event.currentTarget;
+    void readFile(input.files?.[0]).then((accepted) => {
+      input.value = "";
+      if (accepted) {
+        focusSourceReceiptAfterCloseRef.current = true;
+        closeOverlay();
+      }
+    });
   }
 
-  function onFileDrop(event: DragEvent<HTMLLabelElement>) {
+  function onFileDrop(event: DragEvent<HTMLElement>) {
     event.preventDefault();
-    void readFile(event.dataTransfer.files?.[0]);
+    setSourceDragActive(false);
+    if (event.dataTransfer.files.length !== 1) {
+      setSourceModalError("Choose one .txt manuscript at a time.");
+      return;
+    }
+    void readFile(event.dataTransfer.files?.[0]).then((accepted) => {
+      if (accepted) {
+        focusSourceReceiptAfterCloseRef.current = true;
+        closeOverlay();
+      }
+    });
   }
 
   function createProject(event: FormEvent<HTMLFormElement>) {
@@ -383,11 +455,11 @@ export default function BookStudioPrototype() {
       return;
     }
     if (newFileError) {
-      newFileInputRef.current?.focus();
+      openSourceModal(null, "upload");
       return;
     }
     if (manuscriptMissing) {
-      newTextInputRef.current?.focus();
+      openSourceModal(null, "upload");
       return;
     }
     const id = `volume-${Date.now()}`;
@@ -529,6 +601,41 @@ export default function BookStudioPrototype() {
     setManuscriptOpen(true);
   }
 
+  function openSourceModal(event: React.MouseEvent<HTMLElement> | null, mode: SourceMode) {
+    modalReturnFocus.current = event?.currentTarget ?? sourceTriggerRef.current;
+    setSourceMode(mode);
+    setSourceDraft(mode === "paste" && !fileName ? newText : "");
+    setSourceDragActive(false);
+    setSourceModalError("");
+    setSourceModalOpen(true);
+  }
+
+  function usePastedSource() {
+    const text = sourceDraft.trim();
+    if (!text) {
+      setSourceModalError("Paste the manuscript text before adding this source.");
+      newTextInputRef.current?.focus();
+      return;
+    }
+    setNewText(text);
+    setFileName("");
+    setSourceModalError("");
+    setNewFileError("");
+    setNewManuscriptError("");
+    focusSourceReceiptAfterCloseRef.current = true;
+    closeOverlay();
+  }
+
+  function removeSource() {
+    setNewText("");
+    setFileName("");
+    setSourceDraft("");
+    setNewFileError("");
+    setNewManuscriptError("");
+    if (newFileInputRef.current) newFileInputRef.current.value = "";
+    window.setTimeout(() => sourceTriggerRef.current?.focus(), 0);
+  }
+
   function openLightbox(label: string, event: React.MouseEvent<HTMLElement>) {
     modalReturnFocus.current = event.currentTarget;
     setLightbox(label);
@@ -537,7 +644,17 @@ export default function BookStudioPrototype() {
   function closeOverlay() {
     setManuscriptOpen(false);
     setLightbox(null);
-    window.setTimeout(() => modalReturnFocus.current?.focus(), 0);
+    setSourceModalOpen(false);
+    setSourceDragActive(false);
+    setSourceModalError("");
+    window.setTimeout(() => {
+      if (focusSourceReceiptAfterCloseRef.current) {
+        focusSourceReceiptAfterCloseRef.current = false;
+        sourceReplaceRef.current?.focus();
+        return;
+      }
+      modalReturnFocus.current?.focus();
+    }, 0);
   }
 
   function renderMasthead() {
@@ -768,6 +885,7 @@ export default function BookStudioPrototype() {
     const titleInvalid = Boolean(newTitleError);
     const fileInvalid = Boolean(newFileError);
     const manuscriptInvalid = Boolean(newManuscriptError);
+    const manuscriptReady = Boolean(newText.trim() && !newFileError);
     const sourceReady = Boolean(newTitle.trim() && newText.trim() && !newFileError);
 
     return (
@@ -809,95 +927,111 @@ export default function BookStudioPrototype() {
         </section>
 
         <form className="commission-form" onSubmit={createProject} noValidate>
-          <div className="commission-main">
-            <section className="commission-section" aria-labelledby="commission-title-heading">
-              <div className="form-section-heading"><span>01</span><h2 id="commission-title-heading">Name the volume</h2></div>
-              <div className="commission-section-body">
-                <label className="field field-large" htmlFor="new-volume-title">
-                  <span>Volume title</span>
-                  <input
-                    ref={newTitleInputRef}
-                    id="new-volume-title"
-                    name="volumeTitle"
-                    required
-                    aria-invalid={titleInvalid}
-                    aria-describedby={titleInvalid ? "new-title-error" : undefined}
-                    value={newTitle}
-                    onChange={(event) => { setNewTitle(event.target.value); if (newTitleError) setNewTitleError(""); }}
-                    placeholder="The Secret Garden — Illustrated Edition"
-                  />
-                </label>
-                {titleInvalid ? <p className="inline-error" id="new-title-error" role="alert">{newTitleError}</p> : null}
+          <section className="commission-desk" aria-labelledby="commission-desk-heading">
+            <header className="commission-desk-header">
+              <div>
+                <p className="kicker">COMMISSION DESK · SOURCE 01</p>
+                <h2 id="commission-desk-heading">Name the edition. <em>Attach its one source.</em></h2>
               </div>
-            </section>
+              <p>Two details begin the studio: a working title and the complete manuscript. Both remain editable until the volume is created.</p>
+            </header>
 
-            <section className="commission-section commission-source" aria-labelledby="commission-source-heading">
-              <div className="form-section-heading"><span>02</span><h2 id="commission-source-heading">Add the manuscript</h2></div>
-              <div className="commission-section-body">
-                <label className={`${fileName ? "file-drop loaded" : "file-drop"}${fileInvalid ? " invalid" : ""}`} onDragOver={(event) => event.preventDefault()} onDrop={onFileDrop}>
-                  <input
-                    ref={newFileInputRef}
-                    type="file"
-                    name="manuscriptFile"
-                    accept=".txt,text/plain"
-                    aria-invalid={fileInvalid}
-                    aria-describedby={fileInvalid ? "new-file-error" : undefined}
-                    onChange={onFileChange}
-                  />
-                  <span className="file-mark" aria-hidden="true">TXT</span>
-                  <span className="file-copy">
-                    <strong>{fileName || "Drop your .txt manuscript here"}</strong>
-                    <small>{fileName ? `${sourceWords.toLocaleString()} words loaded · select to replace` : "or select a plain-text file from your device"}</small>
-                  </span>
-                  <span className="file-action">{fileName ? "Replace file" : "Browse files"}</span>
-                </label>
-                {fileInvalid ? <p className="inline-error file-error" id="new-file-error" role="alert">{newFileError}</p> : null}
+            <div className="commission-input-grid">
+              <section className="commission-panel title-panel" aria-labelledby="commission-title-heading">
+                <div className="commission-panel-index"><span>01</span><small>VOLUME</small></div>
+                <div className="commission-panel-body">
+                  <p className="kicker" id="commission-title-heading">NAME THE EDITION</p>
+                  <label className="field field-large" htmlFor="new-volume-title">
+                    <span>Volume title</span>
+                    <input
+                      ref={newTitleInputRef}
+                      id="new-volume-title"
+                      name="volumeTitle"
+                      required
+                      aria-invalid={titleInvalid}
+                      aria-describedby={titleInvalid ? "new-title-error" : "volume-title-note"}
+                      value={newTitle}
+                      onChange={(event) => { setNewTitle(event.target.value); if (newTitleError) setNewTitleError(""); }}
+                      placeholder="The Secret Garden — Illustrated Edition"
+                    />
+                  </label>
+                  <p className="panel-note" id="volume-title-note">Use the title that should appear in your working library.</p>
+                  {titleInvalid ? <p className="inline-error" id="new-title-error" role="alert">{newTitleError}</p> : null}
+                </div>
+              </section>
 
-                <div className="or-rule"><span>OR PASTE THE TEXT</span></div>
-                <label className="field" htmlFor="new-manuscript-text">
-                  <span>Manuscript text</span>
-                  <textarea
-                    ref={newTextInputRef}
-                    id="new-manuscript-text"
-                    name="manuscriptText"
-                    required
-                    aria-invalid={manuscriptInvalid}
-                    aria-describedby={manuscriptInvalid ? "new-manuscript-error" : undefined}
-                    rows={10}
-                    value={newText}
-                    onChange={(event) => {
-                      setNewText(event.target.value);
-                      if (fileName) setFileName("");
-                      if (newManuscriptError) setNewManuscriptError("");
-                      if (newFileError) setNewFileError("");
-                    }}
-                    placeholder="Paste the manuscript…"
-                  />
-                </label>
-                <div className="text-counter"><span>{sourceWords.toLocaleString()} words</span><span>Plain text · UTF-8</span></div>
-                {manuscriptInvalid ? <p className="inline-error" id="new-manuscript-error" role="alert">{newManuscriptError}</p> : null}
-              </div>
+              <section className="commission-panel source-panel" aria-labelledby="commission-source-heading">
+                <div className="commission-panel-index"><span>02</span><small>SOURCE</small></div>
+                <div className="commission-panel-body">
+                  <p className="kicker" id="commission-source-heading">SOURCE MANUSCRIPT · TXT / UTF-8</p>
+                  {manuscriptReady ? (
+                    <div className="source-receipt">
+                      <span className="source-receipt-mark" aria-hidden="true">TXT</span>
+                      <span className="source-receipt-copy">
+                        <small>SOURCE READY</small>
+                        <strong>{fileName || "Pasted manuscript"}</strong>
+                        <span role="status" aria-live="polite" aria-label={`${fileName || "Pasted manuscript"}, ${sourceWords.toLocaleString()} words, source ready`}>{sourceWords.toLocaleString()} words · uploaded once</span>
+                      </span>
+                      <span className="source-receipt-actions">
+                        <button
+                          ref={sourceReplaceRef}
+                          type="button"
+                          aria-haspopup="dialog"
+                          aria-controls="source-dialog"
+                          onClick={(event) => openSourceModal(event, fileName ? "upload" : "paste")}
+                        >Replace</button>
+                        <button type="button" onClick={removeSource}>Remove</button>
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="source-empty-state">
+                      <div>
+                        <strong>No manuscript attached.</strong>
+                        <p>Upload once. Folio carries the same source through every stage.</p>
+                      </div>
+                      <button
+                        ref={sourceTriggerRef}
+                        className="source-upload-trigger"
+                        type="button"
+                        aria-haspopup="dialog"
+                        aria-controls="source-dialog"
+                        aria-describedby={fileInvalid ? "new-file-error" : manuscriptInvalid ? "new-manuscript-error" : undefined}
+                        onClick={(event) => openSourceModal(event, "upload")}
+                      >
+                        <span>Upload manuscript</span><span aria-hidden="true">↗</span>
+                      </button>
+                      <button className="source-paste-trigger" type="button" aria-haspopup="dialog" aria-controls="source-dialog" onClick={(event) => openSourceModal(event, "paste")}>Paste text instead</button>
+                    </div>
+                  )}
+                  {fileInvalid && !sourceModalOpen ? <p className="inline-error" id="new-file-error" role="alert">{newFileError}</p> : null}
+                  {manuscriptInvalid ? <p className="inline-error" id="new-manuscript-error" role="alert">{newManuscriptError}</p> : null}
+                </div>
+              </section>
+            </div>
+
+            <section className="pipeline-ledger" aria-labelledby="pipeline-ledger-heading">
+              <header>
+                <div><p className="kicker">THE EDITION PIPELINE</p><h3 id="pipeline-ledger-heading">One source becomes five deliberate stages.</h3></div>
+                <p>UPLOADED ONCE · MANUAL RETRIES</p>
+              </header>
+              <ol>
+                {STEPS.map((step) => (
+                  <li key={step.roman}>
+                    <span>{step.roman}</span>
+                    <p><strong>{step.eyebrow}</strong><small>{step.label}</small></p>
+                  </li>
+                ))}
+              </ol>
             </section>
 
             <div className="commission-actions">
               <div className={sourceReady ? "commission-readiness ready" : "commission-readiness"}>
-                <span>{sourceReady ? "SOURCE READY" : "DRAFT SOURCE"}</span>
-                <p>{sourceReady ? `${sourceWords.toLocaleString()} words prepared · ready to enter Stage I` : "Your commission details remain editable until creation."}</p>
+                <span>{sourceReady ? "COMMISSION READY" : "COMMISSION INCOMPLETE"}</span>
+                <p>{sourceReady ? `${sourceWords.toLocaleString()} words prepared · ready to enter Stage I` : "Add the title and manuscript to open this commission."}</p>
               </div>
-              <button className="primary-button" type="submit">Create volume <span aria-hidden="true">→</span></button>
+              <button className={sourceReady ? "primary-button commission-submit ready" : "primary-button commission-submit"} type="submit">Create this volume <span aria-hidden="true">→</span></button>
             </div>
-          </div>
-          <aside className="commission-aside" aria-label="Five-stage illustration workflow">
-            <p className="kicker">THE FIVE STAGES</p>
-            <h3>One source. Five deliberate stages.</h3>
-            <ol>
-              {STEPS.map((step) => <li key={step.roman}><span>{step.roman}</span><p><strong>{step.eyebrow}</strong>{step.label}</p></li>)}
-            </ol>
-            <div className="cost-note">
-              <span aria-hidden="true">◆</span>
-              <p><strong>Uploaded once</strong>The source is reused at every stage. Generations never retry automatically.</p>
-            </div>
-          </aside>
+          </section>
         </form>
       </main>
     );
@@ -1099,9 +1233,120 @@ export default function BookStudioPrototype() {
         </>
       )}
 
+      {sourceModalOpen ? (
+        <div className="modal-backdrop source-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeOverlay()}>
+          <section
+            ref={overlayDialogRef}
+            id="source-dialog"
+            className="source-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="source-dialog-title"
+            aria-describedby="source-dialog-description"
+          >
+            <header className="source-modal-header">
+              <div>
+                <p className="kicker">ADD SOURCE · TXT ONLY</p>
+                <h2 id="source-dialog-title">Bring in the manuscript.</h2>
+                <p id="source-dialog-description">Choose one complete plain-text source. It will be carried through all five illustration stages.</p>
+              </div>
+              <button ref={overlayCloseRef} className="modal-close" type="button" onClick={closeOverlay} aria-label="Close add manuscript dialog">×</button>
+            </header>
+
+            <div className="source-modal-stage">
+              {sourceMode === "upload" ? (
+                <>
+                  <input
+                    ref={newFileInputRef}
+                    className="source-file-input"
+                    type="file"
+                    tabIndex={-1}
+                    name="manuscriptFile"
+                    accept=".txt,text/plain"
+                    aria-invalid={Boolean(sourceModalError)}
+                    aria-describedby={sourceModalError ? "source-modal-file-error" : "source-upload-help"}
+                    onChange={onFileChange}
+                  />
+                  <button
+                    ref={sourceDropButtonRef}
+                    className={sourceDragActive ? "source-drop-zone dragging" : "source-drop-zone"}
+                    type="button"
+                    onClick={() => newFileInputRef.current?.click()}
+                    onDragEnter={(event) => { event.preventDefault(); setSourceDragActive(true); }}
+                    onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; setSourceDragActive(true); }}
+                    onDragLeave={() => setSourceDragActive(false)}
+                    onDrop={onFileDrop}
+                    aria-describedby={sourceModalError ? "source-modal-file-error" : "source-upload-help"}
+                  >
+                    <span className="source-drop-icon" aria-hidden="true">↑</span>
+                    <span className="source-drop-copy">
+                      <strong>Choose a .txt manuscript</strong>
+                      <small id="source-upload-help">or drop it here · plain text · UTF-8</small>
+                    </span>
+                    <span className="source-drop-action">Browse files</span>
+                  </button>
+                  {sourceModalError ? <p className="inline-error source-modal-error" id="source-modal-file-error" role="alert">{sourceModalError}</p> : null}
+                  {fileName ? <p className="source-current-status">Current source: {fileName} · {wordCount(newText).toLocaleString()} words</p> : null}
+                </>
+              ) : (
+                <div className="source-text-panel">
+                  <div className="source-text-heading">
+                    <label htmlFor="source-manuscript-text">Paste the complete manuscript</label>
+                    <span>{wordCount(sourceDraft).toLocaleString()} words</span>
+                  </div>
+                  <textarea
+                    ref={newTextInputRef}
+                    id="source-manuscript-text"
+                    rows={12}
+                    value={sourceDraft}
+                    aria-invalid={Boolean(sourceModalError)}
+                    aria-describedby={sourceModalError ? "source-modal-text-error" : "source-text-help"}
+                    onChange={(event) => {
+                      setSourceDraft(event.target.value);
+                      if (sourceModalError) setSourceModalError("");
+                      if (newFileError) setNewFileError("");
+                    }}
+                    placeholder="Paste the manuscript…"
+                  />
+                  <div className="source-text-meta"><span id="source-text-help">PLAIN TEXT · UTF-8</span><span>ONE COMPLETE SOURCE</span></div>
+                  {sourceModalError ? <p className="inline-error source-modal-error" id="source-modal-text-error" role="alert">{sourceModalError}</p> : null}
+                  <button className="primary-button source-use-text" type="button" onClick={usePastedSource}>Use pasted text <span aria-hidden="true">→</span></button>
+                </div>
+              )}
+            </div>
+
+            <footer className="source-modal-methods" aria-label="Manuscript source method">
+              <button
+                className={sourceMode === "upload" ? "source-method selected" : "source-method"}
+                type="button"
+                aria-pressed={sourceMode === "upload"}
+                onClick={() => {
+                  setSourceMode("upload");
+                  setNewManuscriptError("");
+                  setSourceModalError("");
+                  window.setTimeout(() => newFileInputRef.current?.click(), 0);
+                }}
+              ><span aria-hidden="true">↑</span><strong>Upload .txt</strong><small>From this device</small></button>
+              <button
+                className={sourceMode === "paste" ? "source-method selected" : "source-method"}
+                type="button"
+                aria-pressed={sourceMode === "paste"}
+                onClick={() => {
+                  setSourceMode("paste");
+                  setNewFileError("");
+                  setSourceModalError("");
+                  window.setTimeout(() => newTextInputRef.current?.focus(), 0);
+                }}
+              ><span aria-hidden="true">¶</span><strong>Text input</strong><small>Paste the manuscript</small></button>
+              <button className="source-modal-cancel" type="button" onClick={closeOverlay}>Cancel</button>
+            </footer>
+          </section>
+        </div>
+      ) : null}
+
       {manuscriptOpen && activeProject ? (
         <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeOverlay()}>
-          <section className="manuscript-modal" role="dialog" aria-modal="true" aria-labelledby="manuscript-title">
+          <section ref={overlayDialogRef} className="manuscript-modal" role="dialog" aria-modal="true" aria-labelledby="manuscript-title">
             <header><div><p className="kicker">SOURCE MANUSCRIPT · READ-ONLY</p><h2 id="manuscript-title">{activeProject.title}</h2></div><button ref={overlayCloseRef} className="modal-close" onClick={closeOverlay} aria-label="Close manuscript">×</button></header>
             <div className="manuscript-copy"><span className="drop-cap">{activeProject.bookText.trim()[0]}</span>{activeProject.bookText.trim().slice(1)}</div>
             <footer><span>{wordCount(activeProject.bookText).toLocaleString()} WORDS</span><span>FULL TEXT REMAINS AVAILABLE AT EVERY STAGE</span></footer>
@@ -1111,7 +1356,7 @@ export default function BookStudioPrototype() {
 
       {lightbox ? (
         <div className="modal-backdrop lightbox-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeOverlay()}>
-          <section className="lightbox" role="dialog" aria-modal="true" aria-label={lightbox}>
+          <section ref={overlayDialogRef} className="lightbox" role="dialog" aria-modal="true" aria-label={lightbox}>
             <button ref={overlayCloseRef} className="modal-close lightbox-close" onClick={closeOverlay} aria-label="Close image">×</button>
             <div className={lightbox.includes("Final") ? "lightbox-image-frame final" : "lightbox-image-frame portrait"}>
               <img
