@@ -212,13 +212,18 @@ export default function BookStudioPrototype() {
   const [newTitle, setNewTitle] = useState("");
   const [newText, setNewText] = useState("");
   const [fileName, setFileName] = useState("");
-  const [newError, setNewError] = useState("");
+  const [newTitleError, setNewTitleError] = useState("");
+  const [newManuscriptError, setNewManuscriptError] = useState("");
+  const [newFileError, setNewFileError] = useState("");
   const [hydrated, setHydrated] = useState(false);
   const timersRef = useRef<number[]>([]);
   const modalReturnFocus = useRef<HTMLElement | null>(null);
   const overlayCloseRef = useRef<HTMLButtonElement | null>(null);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
+  const newTitleInputRef = useRef<HTMLInputElement | null>(null);
+  const newTextInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const newFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const activeProject = useMemo(
     () => projects.find((project) => project.id === activeProjectId) ?? projects[0],
@@ -344,17 +349,18 @@ export default function BookStudioPrototype() {
   async function readFile(file?: File) {
     if (!file) return;
     if (!file.name.toLowerCase().endsWith(".txt")) {
-      setNewError("Please choose a plain .txt manuscript.");
+      setNewFileError("Please choose a plain .txt manuscript.");
       return;
     }
     const text = await file.text();
     if (!text.trim()) {
-      setNewError("That file is empty. Choose another manuscript.");
+      setNewFileError("That file is empty. Choose another manuscript.");
       return;
     }
     setFileName(file.name);
     setNewText(text);
-    setNewError("");
+    setNewFileError("");
+    setNewManuscriptError("");
   }
 
   function onFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -368,8 +374,20 @@ export default function BookStudioPrototype() {
 
   function createProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!newTitle.trim() || !newText.trim()) {
-      setNewError("Add a project title and provide the manuscript text.");
+    const titleMissing = !newTitle.trim();
+    const manuscriptMissing = !newText.trim();
+    setNewTitleError(titleMissing ? "Give this volume a title." : "");
+    setNewManuscriptError(manuscriptMissing ? "Upload or paste a manuscript." : "");
+    if (titleMissing) {
+      newTitleInputRef.current?.focus();
+      return;
+    }
+    if (newFileError) {
+      newFileInputRef.current?.focus();
+      return;
+    }
+    if (manuscriptMissing) {
+      newTextInputRef.current?.focus();
       return;
     }
     const id = `volume-${Date.now()}`;
@@ -391,7 +409,9 @@ export default function BookStudioPrototype() {
     setNewTitle("");
     setNewText("");
     setFileName("");
-    setNewError("");
+    setNewTitleError("");
+    setNewManuscriptError("");
+    setNewFileError("");
     setView("studio");
   }
 
@@ -744,62 +764,126 @@ export default function BookStudioPrototype() {
   }
 
   function renderNewProject() {
+    const sourceWords = wordCount(newText);
+    const titleInvalid = Boolean(newTitleError);
+    const fileInvalid = Boolean(newFileError);
+    const manuscriptInvalid = Boolean(newManuscriptError);
+    const sourceReady = Boolean(newTitle.trim() && newText.trim() && !newFileError);
+
     return (
       <main className="page-shell new-project-page">
         <button className="back-link" onClick={() => setView("library")}>← Return to the library</button>
         <section className="new-project-header">
-          <div>
-            <p className="kicker">NEW COMMISSION · SOURCE MATERIAL</p>
+          <div className="new-project-title">
+            <p className="kicker">NEW VOLUME · SOURCE TEXT</p>
             <h1>Begin a<br /><em>new volume.</em></h1>
+            <div className="new-project-facts" aria-label="Commission parameters">
+              <div><span>SOURCE</span><strong>TXT / UTF-8</strong></div>
+              <div><span>WORKFLOW</span><strong>V STAGES</strong></div>
+              <div><span>RETRIES</span><strong>MANUAL ONLY</strong></div>
+            </div>
           </div>
-          <p>
-            The manuscript becomes the shared context for all five stages. It is sent once,
-            then referenced through the rest of the pipeline.
-          </p>
+          <div className="new-project-intro">
+            <figure className="new-project-plate">
+              <img src="/illustrations/folio-triptych.webp" alt="Three ornate reference plates for riverbank, gothic, and portrait editions" width="1536" height="1024" decoding="async" />
+              <figcaption>REFERENCE FOLIO · PLATES I–III</figcaption>
+            </figure>
+            <p>
+              Give the studio one complete manuscript. We’ll carry the same source through all
+              five illustration stages—uploaded once, never duplicated.
+            </p>
+          </div>
         </section>
 
         <form className="commission-form" onSubmit={createProject} noValidate>
           <div className="commission-main">
-            <div className="form-section-heading"><span>01</span><h2>Name the commission</h2></div>
-            <label className="field field-large">
-              <span>Project title</span>
-              <input value={newTitle} onChange={(event) => setNewTitle(event.target.value)} placeholder="e.g. The Secret Garden — Walled Garden Edition" />
-            </label>
+            <section className="commission-section" aria-labelledby="commission-title-heading">
+              <div className="form-section-heading"><span>01</span><h2 id="commission-title-heading">Name the volume</h2></div>
+              <div className="commission-section-body">
+                <label className="field field-large" htmlFor="new-volume-title">
+                  <span>Volume title</span>
+                  <input
+                    ref={newTitleInputRef}
+                    id="new-volume-title"
+                    name="volumeTitle"
+                    required
+                    aria-invalid={titleInvalid}
+                    aria-describedby={titleInvalid ? "new-title-error" : undefined}
+                    value={newTitle}
+                    onChange={(event) => { setNewTitle(event.target.value); if (newTitleError) setNewTitleError(""); }}
+                    placeholder="The Secret Garden — Illustrated Edition"
+                  />
+                </label>
+                {titleInvalid ? <p className="inline-error" id="new-title-error" role="alert">{newTitleError}</p> : null}
+              </div>
+            </section>
 
-            <div className="form-section-heading spaced"><span>02</span><h2>Provide the manuscript</h2></div>
-            <label className={fileName ? "file-drop loaded" : "file-drop"} onDragOver={(event) => event.preventDefault()} onDrop={onFileDrop}>
-              <input type="file" accept=".txt,text/plain" onChange={onFileChange} />
-              <span className="file-mark" aria-hidden="true">TXT</span>
-              <span>
-                <strong>{fileName || "Drop a .txt file here"}</strong>
-                <small>{fileName ? `${wordCount(newText).toLocaleString()} words loaded · choose to replace` : "or click to choose a plain-text manuscript"}</small>
-              </span>
-              <span className="file-action">{fileName ? "Replace" : "Choose file"}</span>
-            </label>
+            <section className="commission-section commission-source" aria-labelledby="commission-source-heading">
+              <div className="form-section-heading"><span>02</span><h2 id="commission-source-heading">Add the manuscript</h2></div>
+              <div className="commission-section-body">
+                <label className={`${fileName ? "file-drop loaded" : "file-drop"}${fileInvalid ? " invalid" : ""}`} onDragOver={(event) => event.preventDefault()} onDrop={onFileDrop}>
+                  <input
+                    ref={newFileInputRef}
+                    type="file"
+                    name="manuscriptFile"
+                    accept=".txt,text/plain"
+                    aria-invalid={fileInvalid}
+                    aria-describedby={fileInvalid ? "new-file-error" : undefined}
+                    onChange={onFileChange}
+                  />
+                  <span className="file-mark" aria-hidden="true">TXT</span>
+                  <span className="file-copy">
+                    <strong>{fileName || "Drop your .txt manuscript here"}</strong>
+                    <small>{fileName ? `${sourceWords.toLocaleString()} words loaded · select to replace` : "or select a plain-text file from your device"}</small>
+                  </span>
+                  <span className="file-action">{fileName ? "Replace file" : "Browse files"}</span>
+                </label>
+                {fileInvalid ? <p className="inline-error file-error" id="new-file-error" role="alert">{newFileError}</p> : null}
 
-            <div className="or-rule"><span>OR PASTE MANUSCRIPT</span></div>
-            <label className="field">
-              <span>Book text</span>
-              <textarea rows={10} value={newText} onChange={(event) => { setNewText(event.target.value); if (fileName) setFileName(""); }} placeholder="Paste the manuscript here…" />
-            </label>
-            <div className="text-counter"><span>{wordCount(newText).toLocaleString()} words</span><span>Plain text · UTF-8</span></div>
-            {newError ? <p className="inline-error" role="alert">{newError}</p> : null}
+                <div className="or-rule"><span>OR PASTE THE TEXT</span></div>
+                <label className="field" htmlFor="new-manuscript-text">
+                  <span>Manuscript text</span>
+                  <textarea
+                    ref={newTextInputRef}
+                    id="new-manuscript-text"
+                    name="manuscriptText"
+                    required
+                    aria-invalid={manuscriptInvalid}
+                    aria-describedby={manuscriptInvalid ? "new-manuscript-error" : undefined}
+                    rows={10}
+                    value={newText}
+                    onChange={(event) => {
+                      setNewText(event.target.value);
+                      if (fileName) setFileName("");
+                      if (newManuscriptError) setNewManuscriptError("");
+                      if (newFileError) setNewFileError("");
+                    }}
+                    placeholder="Paste the manuscript…"
+                  />
+                </label>
+                <div className="text-counter"><span>{sourceWords.toLocaleString()} words</span><span>Plain text · UTF-8</span></div>
+                {manuscriptInvalid ? <p className="inline-error" id="new-manuscript-error" role="alert">{newManuscriptError}</p> : null}
+              </div>
+            </section>
+
+            <div className="commission-actions">
+              <div className={sourceReady ? "commission-readiness ready" : "commission-readiness"}>
+                <span>{sourceReady ? "SOURCE READY" : "DRAFT SOURCE"}</span>
+                <p>{sourceReady ? `${sourceWords.toLocaleString()} words prepared · ready to enter Stage I` : "Your commission details remain editable until creation."}</p>
+              </div>
+              <button className="primary-button" type="submit">Create volume <span aria-hidden="true">→</span></button>
+            </div>
           </div>
-          <aside className="commission-aside">
-            <p className="kicker">COMMISSION NOTE</p>
+          <aside className="commission-aside" aria-label="Five-stage illustration workflow">
+            <p className="kicker">THE FIVE STAGES</p>
             <h3>One source. Five deliberate stages.</h3>
-            <figure className="commission-plate">
-              <img src="/illustrations/folio-triptych.webp" alt="Three reference book plates" width="1536" height="1024" loading="lazy" decoding="async" />
-              <figcaption>REFERENCE FOLIO · PLATES I–III</figcaption>
-            </figure>
             <ol>
               {STEPS.map((step) => <li key={step.roman}><span>{step.roman}</span><p><strong>{step.eyebrow}</strong>{step.label}</p></li>)}
             </ol>
             <div className="cost-note">
               <span aria-hidden="true">◆</span>
-              <p><strong>Cost discipline</strong>The book is uploaded once. Generation never auto-retries.</p>
+              <p><strong>Uploaded once</strong>The source is reused at every stage. Generations never retry automatically.</p>
             </div>
-            <button className="primary-button full" type="submit">Create volume <span aria-hidden="true">→</span></button>
           </aside>
         </form>
       </main>

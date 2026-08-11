@@ -740,7 +740,7 @@ a:focus-visible {
 }
 
 .library-feature-plate figcaption,
-.commission-plate figcaption {
+.new-project-plate figcaption {
   position: absolute;
   right: 8px;
   bottom: 8px;
@@ -1112,84 +1112,187 @@ a:focus-visible {
 
 .new-project-header {
   display: grid;
-  align-items: end;
-  gap: 70px;
-  padding: 55px 0 46px;
-  border-bottom: 1px solid var(--ink);
-  grid-template-columns: 1.3fr 0.7fr;
+  align-items: stretch;
+  gap: clamp(48px, 6vw, 92px);
+  padding: 46px 0 52px;
+  border-bottom: 1px solid var(--rule-dark);
+  grid-template-columns: minmax(0, 1.15fr) minmax(390px, 0.85fr);
+}
+
+.new-project-title {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .new-project-header h1 {
   margin-bottom: 0;
-  font-size: clamp(58px, 7vw, 105px);
+  font-size: clamp(62px, 6.2vw, 102px);
 }
 
-.new-project-header > p {
-  max-width: 470px;
-  margin: 0 0 10px;
+.new-project-facts {
+  display: grid;
+  max-width: 650px;
+  margin-top: 34px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.new-project-facts > div {
+  display: grid;
+  gap: 4px;
+  padding: 13px 16px;
+  border-right: 1px solid var(--rule);
+}
+
+.new-project-facts > div:first-child {
+  padding-left: 0;
+}
+
+.new-project-facts > div:last-child {
+  border-right: 0;
+}
+
+.new-project-facts span,
+.commission-readiness span {
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.new-project-facts strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.new-project-intro {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.new-project-intro > p {
+  max-width: 48ch;
+  margin: 0;
   color: var(--ink-soft);
   font-family: var(--sans);
-  font-size: 17px;
+  font-size: 15px;
   line-height: 1.65;
+}
+
+.new-project-plate {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+  aspect-ratio: 3 / 2;
+  border: 1px solid var(--rule-dark);
+  background: #d8cdb9;
+  box-shadow: 0 14px 36px rgba(44, 36, 27, 0.12);
+}
+
+.new-project-plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.new-project-plate figcaption {
+  right: auto;
+  left: 8px;
 }
 
 .commission-form {
   display: grid;
-  gap: clamp(38px, 7vw, 110px);
-  padding: 54px 0 90px;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  width: min(1320px, 100%);
+  justify-content: space-between;
+  gap: clamp(48px, 6vw, 88px);
+  margin: 0 auto;
+  padding: 62px 0 96px;
+  grid-template-columns: minmax(0, 850px) minmax(300px, 350px);
 }
 
 .commission-main {
-  max-width: 880px;
+  min-width: 0;
+  border-top: 1px solid var(--ink);
+}
+
+.commission-section {
+  display: grid;
+  gap: clamp(28px, 3vw, 44px);
+  padding: 36px 0 44px;
+  border-bottom: 1px solid var(--rule);
+  grid-template-columns: minmax(140px, 180px) minmax(0, 1fr);
+}
+
+.commission-section-body {
+  min-width: 0;
 }
 
 .form-section-heading {
-  display: grid;
-  align-items: baseline;
-  gap: 18px;
-  margin-bottom: 24px;
-  grid-template-columns: 44px 1fr;
-}
-
-.form-section-heading.spaced {
-  margin-top: 58px;
+  margin: 0;
 }
 
 .form-section-heading span {
   color: var(--gradion-dark);
-  font-family: var(--display);
-  font-size: 28px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
 }
 
 .form-section-heading h2 {
-  margin: 0;
+  margin: 9px 0 0;
   font-family: var(--display);
-  font-size: 31px;
+  font-size: clamp(29px, 2.4vw, 35px);
   font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
 }
 
 .field-large input {
-  font-size: clamp(24px, 2.6vw, 38px);
+  padding: 8px 0 12px;
+  font-family: var(--display);
+  font-size: clamp(27px, 2.4vw, 38px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .file-drop {
   display: grid;
-  min-height: 160px;
+  min-height: 176px;
   align-items: center;
-  gap: 22px;
-  padding: 24px;
+  gap: 24px;
+  padding: 28px;
   border: 1px dashed var(--rule-dark);
-  background: rgba(255, 253, 248, 0.3);
+  background: rgba(220, 225, 215, 0.38);
   cursor: pointer;
   grid-template-columns: 64px 1fr auto;
   transition: border-color 180ms var(--ease), background 180ms var(--ease);
 }
 
 .file-drop:hover,
-.file-drop.loaded {
+.file-drop.loaded,
+.file-drop:focus-within {
   border-color: var(--gradion-dark);
-  background: rgba(255, 253, 248, 0.58);
+  background: rgba(220, 225, 215, 0.62);
+}
+
+.file-drop.invalid {
+  border-color: var(--danger);
+  background: rgba(139, 47, 47, 0.05);
+}
+
+.file-drop:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
 }
 
 .file-drop input {
@@ -1209,7 +1312,7 @@ a:focus-visible {
   border: 1px solid var(--ink);
   color: var(--gradion-dark);
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.11em;
 }
@@ -1221,19 +1324,30 @@ a:focus-visible {
 
 .file-drop strong {
   font-family: var(--display);
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 400;
+  line-height: 1.2;
 }
 
 .file-drop small {
   margin-top: 6px;
   color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.file-copy {
+  min-width: 0;
+}
+
+.file-copy strong {
+  overflow-wrap: anywhere;
 }
 
 .file-action {
   padding: 8px 10px;
   border-bottom: 1px solid var(--ink);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -1243,9 +1357,10 @@ a:focus-visible {
   gap: 16px;
   margin: 30px 0;
   color: var(--ink-soft);
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
 }
 
 .or-rule::before,
@@ -1262,43 +1377,68 @@ a:focus-visible {
   padding-top: 8px;
 }
 
+.commission-main .field textarea {
+  min-height: 240px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.commission-main .field input[aria-invalid="true"],
+.commission-main .field textarea[aria-invalid="true"] {
+  border-bottom-color: var(--danger);
+}
+
+.commission-main .text-counter,
+.commission-readiness span {
+  font-size: 11px;
+}
+
 .commission-main .inline-error {
   margin-top: 18px;
+}
+
+.commission-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding-top: 28px;
+}
+
+.commission-readiness {
+  max-width: 470px;
+}
+
+.commission-readiness.ready span {
+  color: var(--success);
+}
+
+.commission-readiness p {
+  margin: 5px 0 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.commission-actions .primary-button {
+  min-width: 240px;
+  flex: none;
 }
 
 .commission-aside {
   align-self: start;
   padding: 30px;
+  border: 1px solid rgba(69, 89, 72, 0.48);
   border-top: 4px solid var(--gradion);
-  background: var(--paper-soft);
-  box-shadow: var(--shadow);
+  background: #dce1d7;
 }
 
 .commission-aside h3 {
-  margin: 10px 0 24px;
+  margin: 10px 0 28px;
   font-family: var(--display);
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 400;
   line-height: 1.08;
-}
-
-.commission-plate {
-  position: relative;
-  height: 174px;
-  overflow: hidden;
-  margin: 0 0 24px;
-  border: 1px solid var(--rule-dark);
-  background: #d8cdb9;
-}
-
-.commission-plate img {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
 }
 
 .commission-aside ol {
@@ -1311,8 +1451,8 @@ a:focus-visible {
   display: grid;
   align-items: center;
   gap: 12px;
-  padding: 11px 0;
-  border-top: 1px solid var(--rule);
+  padding: 12px 0;
+  border-top: 1px solid rgba(69, 89, 72, 0.24);
   grid-template-columns: 28px 1fr;
 }
 
@@ -1323,18 +1463,18 @@ a:focus-visible {
 }
 
 .commission-aside li p {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  gap: 2px;
   margin: 0;
   color: var(--ink-soft);
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .commission-aside li strong {
   color: var(--ink);
+  font-weight: 600;
 }
 
 .cost-note {
@@ -1356,13 +1496,20 @@ a:focus-visible {
 .cost-note p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .cost-note strong {
   display: block;
   margin-bottom: 3px;
   color: var(--ink);
+}
+
+.commission-aside .cost-note {
+  margin: 24px 0 0;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 /* Studio */
@@ -2337,6 +2484,27 @@ a:focus-visible {
     gap: 42px;
     grid-template-columns: minmax(0, 0.95fr) minmax(500px, 1.05fr);
   }
+
+  .commission-form {
+    gap: 48px;
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  .commission-section {
+    gap: 28px;
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1080px) {
+  .commission-form {
+    gap: 48px;
+    grid-template-columns: 1fr;
+  }
+
+  .commission-aside {
+    width: 100%;
+  }
 }
 
 @media (max-width: 960px) {
@@ -2404,6 +2572,10 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .new-project-intro {
+    width: min(100%, 600px);
+  }
+
   .ledger-head {
     display: none;
   }
@@ -2436,10 +2608,6 @@ a:focus-visible {
 
   .commission-aside {
     width: 100%;
-  }
-
-  .commission-plate {
-    height: 230px;
   }
 
   .library-feature-plate {
@@ -2522,9 +2690,12 @@ a:focus-visible {
     margin-top: 40px;
   }
 
-  .library-intro h1,
-  .new-project-header h1 {
+  .library-intro h1 {
     font-size: clamp(54px, 18vw, 82px);
+  }
+
+  .new-project-header h1 {
+    font-size: clamp(48px, 14vw, 64px);
   }
 
   .wordmark-prefix {
@@ -2567,7 +2738,7 @@ a:focus-visible {
   }
 
   .library-intro-action p,
-  .new-project-header > p {
+  .new-project-intro > p {
     font-size: 15px;
   }
 
@@ -2625,19 +2796,82 @@ a:focus-visible {
   }
 
   .new-project-header {
-    padding: 45px 0 34px;
+    gap: 24px;
+    padding: 38px 0 34px;
+  }
+
+  .new-project-facts {
+    margin-top: 26px;
+  }
+
+  .new-project-facts > div {
+    padding: 11px 9px;
+  }
+
+  .new-project-facts > div:first-child {
+    padding-left: 0;
+  }
+
+  .new-project-facts span {
+    font-size: 10px;
+  }
+
+  .new-project-facts strong {
+    font-size: 11px;
   }
 
   .commission-form {
-    padding-top: 40px;
+    gap: 40px;
+    padding: 44px 0 80px;
   }
 
-  .commission-plate {
-    height: 190px;
+  .commission-section {
+    gap: 22px;
+    padding: 30px 0 36px;
+    grid-template-columns: 1fr;
+  }
+
+  .form-section-heading {
+    display: grid;
+    align-items: baseline;
+    gap: 10px;
+    grid-template-columns: 28px 1fr;
+  }
+
+  .form-section-heading h2 {
+    margin: 0;
+    font-size: 29px;
+  }
+
+  .field-large input {
+    font-size: clamp(26px, 8vw, 30px);
+  }
+
+  .commission-main .field textarea {
+    min-height: 220px;
+  }
+
+  .commission-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .commission-actions .primary-button {
+    width: 100%;
+  }
+
+  .commission-aside {
+    padding: 24px;
+  }
+
+  .commission-aside h3 {
+    font-size: 28px;
   }
 
   .file-drop {
     min-height: 190px;
+    gap: 14px;
+    padding: 20px;
     grid-template-columns: 56px 1fr;
   }
 

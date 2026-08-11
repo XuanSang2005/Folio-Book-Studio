@@ -68,6 +68,15 @@ test("prototype source covers the required product states", async () => {
     "folio-triptych.webp",
     "library-intro-action",
     "PLATE I · THE RIVERBANK",
+    "NEW VOLUME · SOURCE TEXT",
+    "new-project-plate",
+    "commission-actions",
+    "newTitleInputRef",
+    "newTextInputRef",
+    "newFileInputRef",
+    "new-title-error",
+    "new-file-error",
+    "new-manuscript-error",
   ]) {
     assert.match(page, new RegExp(requirement, "i"));
   }
