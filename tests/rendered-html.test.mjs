@@ -72,6 +72,8 @@ test("prototype source covers the required product states", async () => {
     "new-project-proof",
     "new-project-index",
     "proof-card-two",
+    "new-project-brief",
+    "COMMISSION BRIEF",
     "commission-actions",
     "newTitleInputRef",
     "newTextInputRef",

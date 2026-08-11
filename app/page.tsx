@@ -778,10 +778,10 @@ export default function BookStudioPrototype() {
             <i />
             <span>FOLIO / SOURCE</span>
           </div>
-          <div className="new-project-title">
+          <header className="new-project-title">
             <p className="kicker">NEW VOLUME · SOURCE TEXT</p>
             <h1>Begin a <em>new volume.</em></h1>
-          </div>
+          </header>
           <figure className="new-project-proof">
             <div
               className="new-project-proof-grid"
@@ -803,18 +803,21 @@ export default function BookStudioPrototype() {
             </div>
             <figcaption><span>REFERENCE PROOF</span><strong>PLATES I–III · VISUAL RANGE</strong></figcaption>
           </figure>
-          <div className="new-project-intro">
-            <p className="new-project-standfirst">One manuscript becomes a visual world.</p>
-            <p className="new-project-lede">
-              Give the studio one complete manuscript. We’ll carry the same source through all
-              five illustration stages—uploaded once, never duplicated.
-            </p>
-          </div>
-          <div className="new-project-facts" role="group" aria-label="Commission parameters">
-            <div><span>01 / SOURCE</span><strong>PLAIN TEXT · UTF-8</strong></div>
-            <div><span>02 / WORKFLOW</span><strong>FIVE DELIBERATE STAGES</strong></div>
-            <div><span>03 / RETRIES</span><strong>MANUAL CONTROL ONLY</strong></div>
-          </div>
+          <aside className="new-project-brief" aria-labelledby="new-project-brief-title">
+            <div className="new-project-intro">
+              <p className="kicker">COMMISSION BRIEF · 01</p>
+              <h2 className="new-project-standfirst" id="new-project-brief-title">One manuscript. A whole visual world.</h2>
+              <p className="new-project-lede">
+                Provide the complete text once. Folio carries the same source through five
+                deliberate stages, with every retry left in your hands.
+              </p>
+            </div>
+            <dl className="new-project-facts" aria-label="Commission parameters">
+              <div><dt>SOURCE</dt><dd>Plain text · UTF-8</dd></div>
+              <div><dt>WORKFLOW</dt><dd>Five deliberate stages</dd></div>
+              <div><dt>CONTROL</dt><dd>Manual retries only</dd></div>
+            </dl>
+          </aside>
         </section>
 
         <form className="commission-form" onSubmit={createProject} noValidate>
