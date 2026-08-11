@@ -66,6 +66,8 @@ test("prototype source covers the required product states", async () => {
     "emailInputRef",
     "projectPlateSrc",
     "folio-triptych.webp",
+    "library-intro-action",
+    "PLATE I · THE RIVERBANK",
   ]) {
     assert.match(page, new RegExp(requirement, "i"));
   }

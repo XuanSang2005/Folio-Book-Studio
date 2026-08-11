@@ -672,19 +672,21 @@ export default function BookStudioPrototype() {
           <div className="library-intro-copy">
             <figure className="library-feature-plate">
               <img
-                src="/illustrations/folio-triptych.webp"
-                alt="Three illustrated literary plates for Riverbank, Frankenstein, and Dorian Gray"
-                width="1536"
-                height="1024"
+                src="/illustrations/riverbank.webp"
+                alt="Illustrated Riverbank plate featuring Mole and Ratty beside a blue boat"
+                width="486"
+                height="976"
                 decoding="async"
               />
-              <figcaption>THREE VOLUMES · ONE VISUAL LIBRARY</figcaption>
+              <figcaption>PLATE I · THE RIVERBANK</figcaption>
             </figure>
-            <p>
-              Good afternoon, {userName.split(" ")[0]}. Each volume preserves its manuscript,
-              visual direction, cast, and every generated plate.
-            </p>
-            <button className="primary-button" onClick={() => setView("new")}>Commission a new volume <span aria-hidden="true">→</span></button>
+            <div className="library-intro-action">
+              <p>
+                Good afternoon, {userName.split(" ")[0]}. Each volume preserves its manuscript,
+                visual direction, cast, and every generated plate.
+              </p>
+              <button className="primary-button" onClick={() => setView("new")}>Commission a new volume <span aria-hidden="true">→</span></button>
+            </div>
           </div>
         </section>
 
