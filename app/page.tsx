@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import {
@@ -173,6 +174,14 @@ function projectStatus(project: Project) {
   if (project.completedSteps === 0) return "Draft";
   if (project.completedSteps === STEPS.length) return "Done";
   return "In progress";
+}
+
+function projectPlateSrc(project: Project) {
+  const identity = `${project.id} ${project.title}`.toLowerCase();
+  if (identity.includes("frankenstein")) return "/illustrations/frankenstein.webp";
+  if (identity.includes("dorian")) return "/illustrations/dorian-gray.webp";
+  if (identity.includes("riverbank") || identity.includes("willows")) return "/illustrations/riverbank.webp";
+  return "/illustrations/folio-triptych.webp";
 }
 
 function wordCount(text: string) {
@@ -513,43 +522,32 @@ export default function BookStudioPrototype() {
 
   function renderMasthead() {
     return (
-      <>
-        <header className="masthead">
-          <button className="wordmark" onClick={() => setView("library")} aria-label="Go to project library">
-            <span className="wordmark-prefix">GRADION /</span>
-            <span className="wordmark-title">Folio</span>
+      <header className="masthead">
+        <button className="wordmark" onClick={() => setView("library")} aria-label="Go to project library">
+          <span className="wordmark-prefix">GRADION /</span>
+          <span className="wordmark-title">Folio</span>
+        </button>
+        <nav className="masthead-nav" aria-label="Primary navigation">
+          <button className={view === "library" ? "nav-link active" : "nav-link"} onClick={() => setView("library")}>
+            Library
           </button>
-          <nav className="masthead-nav" aria-label="Primary navigation">
-            <button className={view === "library" ? "nav-link active" : "nav-link"} onClick={() => setView("library")}>
-              Library
-            </button>
-            <button className={view === "new" ? "nav-link active" : "nav-link"} onClick={() => setView("new")}>
-              New volume
-            </button>
-          </nav>
-          <div className="account-block">
-            <span className="account-seal" aria-hidden="true">
-              {userName
-                .split(" ")
-                .map((part) => part[0])
-                .join("")
-                .slice(0, 2)
-                .toUpperCase()}
-            </span>
-            <span className="account-name">{userName}</span>
-            <button className="text-link" onClick={signOut}>Sign out</button>
-          </div>
-        </header>
-        <div className="edition-strip" aria-label="Prototype information">
-          <span>INTERACTIVE PROTOTYPE</span>
-          <span className="edition-diamond" aria-hidden="true">◆</span>
-          <span>EDITION № 01</span>
-          <span className="edition-diamond" aria-hidden="true">◆</span>
-          <span>5-STAGE GEMINI PIPELINE</span>
-          <span className="edition-diamond" aria-hidden="true">◆</span>
-          <span>CALLS SIMULATED</span>
+          <button className={view === "new" ? "nav-link active" : "nav-link"} onClick={() => setView("new")}>
+            New volume
+          </button>
+        </nav>
+        <div className="account-block">
+          <span className="account-seal" aria-hidden="true">
+            {userName
+              .split(" ")
+              .map((part) => part[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase()}
+          </span>
+          <span className="account-name">{userName}</span>
+          <button className="text-link" onClick={signOut}>Sign out</button>
         </div>
-      </>
+      </header>
     );
   }
 
@@ -565,6 +563,16 @@ export default function BookStudioPrototype() {
             <strong>Folio</strong>
             <small>BOOK ILLUSTRATION STUDIO</small>
           </div>
+
+          <figure className="login-plate-gallery" aria-hidden="true">
+            {[
+              "/illustrations/riverbank.webp",
+              "/illustrations/frankenstein.webp",
+              "/illustrations/dorian-gray.webp",
+            ].map((src) => (
+              <span key={src}><img src={src} alt="" width="490" height="976" decoding="async" /></span>
+            ))}
+          </figure>
 
           <div className="login-story">
             <p className="kicker">FIG. 01 — STUDIO ENTRY</p>
@@ -672,6 +680,16 @@ export default function BookStudioPrototype() {
             <h1>Your volumes,<br /><em>in progress.</em></h1>
           </div>
           <div className="library-intro-copy">
+            <figure className="library-feature-plate">
+              <img
+                src="/illustrations/folio-triptych.webp"
+                alt="Three illustrated literary plates for Riverbank, Frankenstein, and Dorian Gray"
+                width="1536"
+                height="1024"
+                decoding="async"
+              />
+              <figcaption>THREE VOLUMES · ONE VISUAL LIBRARY</figcaption>
+            </figure>
             <p>
               Good afternoon, {userName.split(" ")[0]}. Each volume preserves its manuscript,
               visual direction, cast, and every generated plate.
@@ -698,7 +716,10 @@ export default function BookStudioPrototype() {
             {visibleProjects.map((project) => (
               <button className="project-row" key={project.id} onClick={() => openProject(project.id)}>
                 <span className="project-title-block">
-                  <span className="volume-number">{project.volume}</span>
+                  <span className="project-thumbnail" aria-hidden="true">
+                    <img src={projectPlateSrc(project)} alt="" width="490" height="976" loading="lazy" decoding="async" />
+                    <span>{project.volume}</span>
+                  </span>
                   <span>
                     <strong>{project.title}</strong>
                     <small>Created {formatDate(project.createdAt)} · {wordCount(project.bookText).toLocaleString()} words</small>
@@ -718,7 +739,9 @@ export default function BookStudioPrototype() {
           </section>
         ) : (
           <section className="empty-library">
-            <div className="empty-mark" aria-hidden="true"><span>∅</span></div>
+            <figure className="empty-plate" aria-hidden="true">
+              <img src="/illustrations/folio-triptych.webp" alt="" width="1536" height="1024" loading="lazy" decoding="async" />
+            </figure>
             <div>
               <p className="kicker">THE SHELVES ARE WAITING</p>
               <h2>Your first volume begins with a manuscript.</h2>
@@ -783,6 +806,10 @@ export default function BookStudioPrototype() {
           <aside className="commission-aside">
             <p className="kicker">COMMISSION NOTE</p>
             <h3>One source. Five deliberate stages.</h3>
+            <figure className="commission-plate">
+              <img src="/illustrations/folio-triptych.webp" alt="Three reference book plates" width="1536" height="1024" loading="lazy" decoding="async" />
+              <figcaption>REFERENCE FOLIO · PLATES I–III</figcaption>
+            </figure>
             <ol>
               {STEPS.map((step) => <li key={step.roman}><span>{step.roman}</span><p><strong>{step.eyebrow}</strong>{step.label}</p></li>)}
             </ol>
@@ -812,9 +839,17 @@ export default function BookStudioPrototype() {
           disabled={!ready}
           aria-label={ready ? `Open portrait of ${character.name}` : `${character.name} portrait not generated yet`}
         >
-          <span className="portrait-halo" />
-          <span className="portrait-head" />
-          <span className="portrait-body" />
+          {ready ? (
+            <img
+              className="portrait-image"
+              src={index === 0 ? "/illustrations/mole-portrait.webp" : "/illustrations/ratty-portrait.webp"}
+              alt={`Illustrated portrait of ${character.name}`}
+              width="220"
+              height="330"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
           {generating ? <span className="press-loader"><i />Rendering plate {STEPS[index].roman}</span> : null}
           {!ready && !generating ? <span className="not-generated">PLATE AWAITS</span> : null}
         </button>
@@ -917,8 +952,8 @@ export default function BookStudioPrototype() {
               <section className="artifact-section chapter-section">
                 <div className="section-heading-row"><div><p className="kicker">SCENE BLUEPRINT · 1 OF 1 SLOT USED</p><h2>{activeProject.chapter?.name ?? SAMPLE_CHAPTER.name}</h2></div><span>CHAPTER PLATE</span></div>
                 <button className={`chapter-art ${complete ? "ready" : "waiting"}`} onClick={(event) => complete && openLightbox(`${activeProject.chapter?.name ?? SAMPLE_CHAPTER.name} · Final illustration`, event)} disabled={!complete}>
-                  <span className="sun-disc" /><span className="river-line river-one" /><span className="river-line river-two" /><span className="bank bank-left" /><span className="bank bank-right" /><span className="figure figure-one" /><span className="figure figure-two" />
-                  {!complete ? <span className="chapter-awaits">FINAL PLATE AWAITS STAGE V</span> : <span className="chapter-ready-label">FINAL PLATE · THE RIVERBANK</span>}
+                  <img className="chapter-image" src={projectPlateSrc(activeProject)} alt="" width="490" height="976" loading="lazy" decoding="async" />
+                  {!complete ? <span className="chapter-awaits">FINAL PLATE AWAITS STAGE V</span> : <span className="chapter-ready-label">FINAL PLATE · {(activeProject.chapter?.name ?? SAMPLE_CHAPTER.name).toUpperCase()}</span>}
                 </button>
                 <p className="chapter-prompt">{activeProject.chapter?.prompt ?? SAMPLE_CHAPTER.prompt}</p>
               </section>
@@ -999,8 +1034,18 @@ export default function BookStudioPrototype() {
         <div className="modal-backdrop lightbox-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeOverlay()}>
           <section className="lightbox" role="dialog" aria-modal="true" aria-label={lightbox}>
             <button ref={overlayCloseRef} className="modal-close lightbox-close" onClick={closeOverlay} aria-label="Close image">×</button>
-            <div className={lightbox.includes("Final") ? "chapter-art ready lightbox-art" : `portrait-art ${lightbox.includes("Ratty") ? "portrait-2" : "portrait-1"} ready lightbox-art`}>
-              {lightbox.includes("Final") ? <><span className="sun-disc" /><span className="river-line river-one" /><span className="river-line river-two" /><span className="bank bank-left" /><span className="bank bank-right" /><span className="figure figure-one" /><span className="figure figure-two" /></> : <><span className="portrait-halo" /><span className="portrait-head" /><span className="portrait-body" /></>}
+            <div className={lightbox.includes("Final") ? "lightbox-image-frame final" : "lightbox-image-frame portrait"}>
+              <img
+                src={lightbox.includes("Final") && activeProject
+                  ? projectPlateSrc(activeProject)
+                  : lightbox.includes("Ratty")
+                    ? "/illustrations/ratty-portrait.webp"
+                    : "/illustrations/mole-portrait.webp"}
+                alt={lightbox}
+                width="490"
+                height="976"
+                decoding="async"
+              />
             </div>
             <p>{lightbox}</p>
           </section>

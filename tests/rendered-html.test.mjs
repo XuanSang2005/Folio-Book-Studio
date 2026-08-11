@@ -37,6 +37,9 @@ test("server-renders the Folio studio entry experience", async () => {
   assert.match(html, /PROTOTYPE IDENTITY/);
   assert.match(html, /FULL NAME/i);
   assert.match(html, /EMAIL/i);
+  assert.match(html, /riverbank\.webp/i);
+  assert.match(html, /frankenstein\.webp/i);
+  assert.match(html, /dorian-gray\.webp/i);
   assert.match(html, /og\.png/);
   assert.doesNotMatch(html, /type="password"/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Your site is taking shape/i);
@@ -63,7 +66,11 @@ test("prototype source covers the required product states", async () => {
     "aria-invalid",
     "nameInputRef",
     "emailInputRef",
+    "projectPlateSrc",
+    "folio-triptych.webp",
   ]) {
     assert.match(page, new RegExp(requirement, "i"));
   }
+
+  assert.doesNotMatch(page, /edition-strip|INTERACTIVE PROTOTYPE|EDITION № 01/);
 });

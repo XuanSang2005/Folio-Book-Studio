@@ -51,8 +51,11 @@ body {
     var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 16px;
+  font-synthesis: none;
+  line-height: 1.62;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 button,
@@ -93,10 +96,10 @@ a:focus-visible {
 .kicker {
   margin: 0;
   color: var(--ink-soft);
-  font-family: var(--mono);
-  font-size: 10px;
+  font-family: var(--sans);
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
   line-height: 1.4;
   text-transform: uppercase;
 }
@@ -113,7 +116,7 @@ a:focus-visible {
   border-radius: 1px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 600;
   transition: background 180ms var(--ease), color 180ms var(--ease), transform 180ms var(--ease);
 }
 
@@ -192,10 +195,10 @@ a:focus-visible {
 
 .field > span {
   color: var(--ink-soft);
-  font-family: var(--mono);
-  font-size: 10px;
+  font-family: var(--sans);
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -206,8 +209,8 @@ a:focus-visible {
   border-bottom: 1px solid var(--rule-dark);
   border-radius: 0;
   background: transparent;
-  font-family: var(--display);
-  font-size: 19px;
+  font-family: var(--sans);
+  font-size: 18px;
   outline: 0;
   transition: border-color 180ms var(--ease), background 180ms var(--ease);
 }
@@ -280,6 +283,54 @@ a:focus-visible {
   pointer-events: none;
 }
 
+.login-plate-gallery {
+  position: absolute;
+  z-index: 1;
+  top: 12%;
+  right: clamp(18px, 4vw, 64px);
+  bottom: 11%;
+  width: min(38%, 320px);
+  margin: 0;
+  pointer-events: none;
+}
+
+.login-plate-gallery span {
+  position: absolute;
+  display: block;
+  width: 58%;
+  height: 58%;
+  overflow: hidden;
+  border: 5px solid rgba(248, 244, 235, 0.9);
+  box-shadow: 0 18px 45px rgba(41, 31, 21, 0.2);
+}
+
+.login-plate-gallery span:nth-child(1) {
+  top: 0;
+  left: 0;
+  transform: rotate(-3.5deg);
+}
+
+.login-plate-gallery span:nth-child(2) {
+  top: 21%;
+  right: 0;
+  transform: rotate(2.6deg);
+}
+
+.login-plate-gallery span:nth-child(3) {
+  bottom: 0;
+  left: 8%;
+  transform: rotate(-1.4deg);
+}
+
+.login-plate-gallery img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .login-wordmark {
   position: relative;
   z-index: 2;
@@ -292,31 +343,31 @@ a:focus-visible {
 .login-wordmark > span {
   color: var(--gradion-dark);
   font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
 }
 
 .login-wordmark strong {
   font-family: var(--display);
   font-size: clamp(27px, 2.5vw, 39px);
-  font-weight: 440;
-  letter-spacing: -0.045em;
+  font-weight: 400;
+  letter-spacing: -0.03em;
 }
 
 .login-wordmark small {
   margin-left: 8px;
   color: var(--ink-soft);
-  font-family: var(--mono);
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.11em;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
 }
 
 .login-story {
   position: relative;
   z-index: 2;
-  width: min(100%, 720px);
+  width: min(72%, 720px);
   margin: clamp(70px, 11vh, 150px) 0 80px;
 }
 
@@ -324,9 +375,9 @@ a:focus-visible {
   margin: 18px 0 36px;
   font-family: var(--display);
   font-size: clamp(58px, 7vw, 112px);
-  font-weight: 390;
-  letter-spacing: -0.05em;
-  line-height: 0.88;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
 }
 
 .login-story h1 span,
@@ -338,7 +389,8 @@ a:focus-visible {
   position: relative;
   width: fit-content;
   color: var(--gradion-dark);
-  font-weight: 320;
+  font-style: italic;
+  font-weight: 400;
 }
 
 .login-story h1 em::after {
@@ -374,10 +426,10 @@ a:focus-visible {
   margin-top: 12px;
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 10px;
   font-style: normal;
-  font-weight: 650;
-  letter-spacing: 0.13em;
+  font-weight: 550;
+  letter-spacing: 0.09em;
 }
 
 .login-stage-index {
@@ -396,8 +448,8 @@ a:focus-visible {
   padding: 11px 6px 0 0;
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 7px;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -405,7 +457,7 @@ a:focus-visible {
   color: var(--gradion-dark);
   font-family: var(--display);
   font-size: 18px;
-  font-weight: 450;
+  font-weight: 400;
 }
 
 .login-admission-seal {
@@ -429,15 +481,15 @@ a:focus-visible {
 }
 
 .login-admission-seal span {
-  font-size: 8px;
-  letter-spacing: 0.14em;
+  font-size: 10px;
+  letter-spacing: 0.09em;
 }
 
 .login-admission-seal strong {
   margin: 3px 0;
   font-family: var(--display);
   font-size: 19px;
-  font-weight: 450;
+  font-weight: 400;
 }
 
 .login-admission-seal em {
@@ -490,18 +542,18 @@ a:focus-visible {
   margin: 12px 0 16px;
   font-family: var(--display);
   font-size: clamp(42px, 4vw, 61px);
-  font-weight: 420;
-  letter-spacing: -0.045em;
-  line-height: 0.96;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1;
 }
 
 .login-entry-lede {
   max-width: 410px;
   margin: 0;
   color: var(--ink-soft);
-  font-family: var(--display);
-  font-size: 17px;
-  line-height: 1.55;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
 }
 
 .login-form {
@@ -516,7 +568,7 @@ a:focus-visible {
   min-height: 54px;
   border-bottom-width: 2px;
   font-family: var(--sans);
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .login-field input[aria-invalid="true"] {
@@ -531,10 +583,9 @@ a:focus-visible {
   min-width: 145px;
   margin-top: 32px;
   padding: 14px 24px;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.04em;
 }
 
 .login-sample {
@@ -584,15 +635,15 @@ a:focus-visible {
 .login-entry-footer span {
   color: var(--gradion-dark);
   font-family: var(--mono);
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
 .login-entry-footer p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .library-intro h1,
@@ -600,16 +651,17 @@ a:focus-visible {
   margin: 18px 0 28px;
   font-family: var(--display);
   font-size: clamp(60px, 7.4vw, 126px);
-  font-weight: 420;
-  letter-spacing: -0.055em;
-  line-height: 0.86;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.93;
 }
 
 .library-intro h1 em,
 .new-project-header h1 em {
   display: block;
   color: var(--gradion-dark);
-  font-weight: 330;
+  font-style: italic;
+  font-weight: 400;
 }
 
 /* Masthead */
@@ -641,15 +693,15 @@ a:focus-visible {
   color: var(--gradion-dark);
   font-family: var(--mono);
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.09em;
 }
 
 .wordmark-title {
   font-family: var(--display);
   font-size: 34px;
-  font-weight: 440;
-  letter-spacing: -0.04em;
+  font-weight: 400;
+  letter-spacing: -0.025em;
 }
 
 .masthead-nav {
@@ -658,9 +710,10 @@ a:focus-visible {
 }
 
 .nav-link {
-  font-family: var(--display);
-  font-size: 18px;
-  font-weight: 470;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 550;
+  letter-spacing: 0.01em;
 }
 
 .account-block {
@@ -684,31 +737,13 @@ a:focus-visible {
 }
 
 .account-name {
-  font-size: 13px;
-  font-weight: 650;
+  font-size: 14px;
+  font-weight: 550;
 }
 
 .account-block .text-link {
   color: var(--ink-soft);
-  font-size: 11px;
-}
-
-.edition-strip {
-  display: flex;
-  min-height: 34px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 7px clamp(18px, 3.2vw, 54px);
-  border-bottom: 1px solid var(--rule);
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-}
-
-.edition-diamond {
-  color: var(--gradion-dark);
-  font-size: 7px;
+  font-size: 13px;
 }
 
 .page-shell {
@@ -735,12 +770,51 @@ a:focus-visible {
   padding-bottom: 8px;
 }
 
+.library-feature-plate {
+  position: relative;
+  height: 156px;
+  overflow: hidden;
+  margin: 0 0 24px;
+  border: 1px solid var(--rule-dark);
+  background: #d8cdb9;
+  box-shadow: 0 12px 32px rgba(44, 36, 27, 0.12);
+}
+
+.library-feature-plate img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 44%;
+  transition: transform 500ms var(--ease);
+}
+
+.library-feature-plate:hover img {
+  transform: scale(1.025);
+}
+
+.library-feature-plate figcaption,
+.commission-plate figcaption {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 5px 7px;
+  background: rgba(248, 244, 235, 0.9);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+}
+
 .library-intro-copy p {
   margin: 0 0 26px;
   color: var(--ink-soft);
-  font-family: var(--display);
-  font-size: 20px;
-  line-height: 1.5;
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.65;
 }
 
 .ledger-summary {
@@ -770,16 +844,16 @@ a:focus-visible {
 .plate-meta {
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  font-weight: 550;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .ledger-summary strong {
   font-family: var(--display);
   font-size: 28px;
-  font-weight: 440;
+  font-weight: 400;
 }
 
 .project-ledger {
@@ -826,22 +900,55 @@ a:focus-visible {
   display: grid;
   align-items: center;
   gap: 22px;
-  grid-template-columns: 72px 1fr;
+  grid-template-columns: 74px 1fr;
 }
 
-.volume-number {
-  color: var(--gradion-dark);
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 0.12em;
+.project-thumbnail {
+  position: relative;
+  display: block;
+  width: 66px;
+  height: 82px;
+  overflow: hidden;
+  border: 1px solid var(--rule-dark);
+  background: #d8cdb9;
+  box-shadow: 0 6px 18px rgba(44, 36, 27, 0.11);
+}
+
+.project-thumbnail img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 220ms var(--ease), transform 320ms var(--ease);
+}
+
+.project-thumbnail > span {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  left: 4px;
+  padding: 3px 4px;
+  background: rgba(28, 27, 24, 0.82);
+  color: var(--paper-bright);
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+.project-row:hover .project-thumbnail img {
+  filter: saturate(1.06);
+  transform: scale(1.045);
 }
 
 .project-title-block strong {
   display: block;
   font-family: var(--display);
   font-size: clamp(19px, 1.65vw, 26px);
-  font-weight: 470;
+  font-weight: 400;
   line-height: 1.2;
 }
 
@@ -850,7 +957,7 @@ a:focus-visible {
   display: block;
   margin-top: 6px;
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .project-progress-block {
@@ -887,9 +994,9 @@ a:focus-visible {
   padding: 6px 10px;
   border: 1px solid currentColor;
   font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   transform: rotate(-1deg);
 }
@@ -926,22 +1033,27 @@ a:focus-visible {
   padding: clamp(34px, 6vw, 88px);
   border: 1px solid var(--rule-dark);
   background: rgba(255, 253, 248, 0.42);
-  grid-template-columns: 0.5fr 1fr;
+  grid-template-columns: minmax(280px, 0.72fr) 1fr;
 }
 
-.empty-mark {
-  display: grid;
-  aspect-ratio: 1;
-  place-items: center;
+.empty-plate {
+  position: relative;
+  min-height: 320px;
+  overflow: hidden;
+  margin: 0;
   border: 1px solid var(--rule-dark);
-  background: repeating-linear-gradient(90deg, transparent 0 22px, rgba(28, 27, 24, 0.05) 23px 24px);
+  background: #d8cdb9;
+  box-shadow: var(--shadow);
 }
 
-.empty-mark span {
-  color: var(--gradion-dark);
-  font-family: var(--display);
-  font-size: clamp(72px, 10vw, 150px);
-  font-weight: 260;
+.empty-plate img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .empty-library h2 {
@@ -949,9 +1061,9 @@ a:focus-visible {
   margin: 12px 0;
   font-family: var(--display);
   font-size: clamp(38px, 4.4vw, 68px);
-  font-weight: 420;
-  letter-spacing: -0.04em;
-  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.04;
 }
 
 .empty-library p:not(.kicker) {
@@ -969,8 +1081,8 @@ a:focus-visible {
   margin-bottom: 70px;
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
 
 /* New project */
@@ -981,9 +1093,10 @@ a:focus-visible {
 
 .back-link {
   color: var(--ink-soft);
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -1005,9 +1118,9 @@ a:focus-visible {
   max-width: 470px;
   margin: 0 0 10px;
   color: var(--ink-soft);
-  font-family: var(--display);
-  font-size: 20px;
-  line-height: 1.5;
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.65;
 }
 
 .commission-form {
@@ -1043,7 +1156,7 @@ a:focus-visible {
   margin: 0;
   font-family: var(--display);
   font-size: 31px;
-  font-weight: 470;
+  font-weight: 400;
 }
 
 .field-large input {
@@ -1087,7 +1200,7 @@ a:focus-visible {
   color: var(--gradion-dark);
   font-family: var(--mono);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.11em;
 }
 
@@ -1099,7 +1212,7 @@ a:focus-visible {
 .file-drop strong {
   font-family: var(--display);
   font-size: 22px;
-  font-weight: 470;
+  font-weight: 400;
 }
 
 .file-drop small {
@@ -1111,7 +1224,7 @@ a:focus-visible {
   padding: 8px 10px;
   border-bottom: 1px solid var(--ink);
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .or-rule {
@@ -1121,8 +1234,8 @@ a:focus-visible {
   margin: 30px 0;
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.13em;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
 
 .or-rule::before,
@@ -1155,8 +1268,27 @@ a:focus-visible {
   margin: 10px 0 24px;
   font-family: var(--display);
   font-size: 30px;
-  font-weight: 430;
+  font-weight: 400;
   line-height: 1.08;
+}
+
+.commission-plate {
+  position: relative;
+  height: 174px;
+  overflow: hidden;
+  margin: 0 0 24px;
+  border: 1px solid var(--rule-dark);
+  background: #d8cdb9;
+}
+
+.commission-plate img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .commission-aside ol {
@@ -1186,8 +1318,8 @@ a:focus-visible {
   margin: 0;
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -1208,13 +1340,13 @@ a:focus-visible {
 
 .cost-note > span {
   color: var(--gradion-dark);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .cost-note p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .cost-note strong {
@@ -1257,30 +1389,30 @@ a:focus-visible {
   align-self: end;
   font-family: var(--display);
   font-size: 47px;
-  font-weight: 330;
+  font-weight: 400;
   line-height: 1;
 }
 
 .volume-monogram small {
   align-self: start;
   font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
 
 .project-heading h1 {
   margin: 7px 0 6px;
   font-family: var(--display);
   font-size: clamp(36px, 4.7vw, 69px);
-  font-weight: 430;
-  letter-spacing: -0.045em;
-  line-height: 0.98;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
 }
 
 .project-byline {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .studio-stepper {
@@ -1335,15 +1467,15 @@ a:focus-visible {
 .studio-stepper small {
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .studio-stepper strong {
   font-family: var(--display);
   font-size: 18px;
-  font-weight: 480;
+  font-weight: 400;
 }
 
 .studio-stepper em {
@@ -1352,9 +1484,9 @@ a:focus-visible {
   bottom: 8px;
   color: var(--ink-faint);
   font-family: var(--mono);
-  font-size: 7px;
+  font-size: 10px;
   font-style: normal;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.07em;
 }
 
 .studio-stepper li.done .step-roman,
@@ -1408,7 +1540,7 @@ a:focus-visible {
   color: var(--gradion-dark);
   font-family: var(--display);
   font-size: 64px;
-  font-weight: 280;
+  font-weight: 400;
   line-height: 1;
 }
 
@@ -1422,8 +1554,8 @@ a:focus-visible {
   margin: 10px 0 13px;
   font-family: var(--display);
   font-size: clamp(34px, 3.7vw, 56px);
-  font-weight: 420;
-  letter-spacing: -0.035em;
+  font-weight: 400;
+  letter-spacing: -0.025em;
   line-height: 1.02;
 }
 
@@ -1480,8 +1612,8 @@ a:focus-visible {
   margin-top: 10px;
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
@@ -1508,14 +1640,14 @@ a:focus-visible {
   margin: 5px 0 0;
   font-family: var(--display);
   font-size: 35px;
-  font-weight: 440;
+  font-weight: 400;
 }
 
 .section-heading-row > span {
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  letter-spacing: 0.07em;
 }
 
 .portrait-grid {
@@ -1561,6 +1693,23 @@ a:focus-visible {
   background:
     repeating-linear-gradient(135deg, transparent 0 13px, rgba(28, 27, 24, 0.035) 14px 15px),
     #e5ded1;
+}
+
+.portrait-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  filter: saturate(0.9) contrast(1.03);
+  transition: filter 240ms var(--ease), transform 420ms var(--ease);
+}
+
+.portrait-art:hover .portrait-image {
+  filter: saturate(1) contrast(1.04);
+  transform: scale(1.025);
 }
 
 .portrait-halo,
@@ -1660,8 +1809,8 @@ a:focus-visible {
   gap: 9px;
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
@@ -1689,7 +1838,7 @@ a:focus-visible {
   margin: 18px 0 1px;
   font-family: var(--display);
   font-size: 30px;
-  font-weight: 460;
+  font-weight: 400;
 }
 
 .role-line {
@@ -1708,16 +1857,17 @@ a:focus-visible {
   padding: 10px 0;
   cursor: pointer;
   font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 650;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
 .portrait-card details p {
   margin: 3px 0 0;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .chapter-art {
@@ -1727,9 +1877,7 @@ a:focus-visible {
   overflow: hidden;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--rule-dark);
-  background:
-    linear-gradient(to bottom, rgba(241, 178, 105, 0.7) 0 36%, rgba(219, 202, 165, 0.8) 36% 54%, rgba(62, 87, 80, 0.72) 54%),
-    #bd9c72;
+  background: #bd9c72;
   cursor: zoom-in;
 }
 
@@ -1738,7 +1886,28 @@ a:focus-visible {
 }
 
 .chapter-art.waiting {
-  filter: grayscale(0.78) opacity(0.66);
+  background: #ded7c9;
+}
+
+.chapter-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  filter: saturate(0.92) contrast(1.03);
+  transition: filter 240ms var(--ease), transform 500ms var(--ease);
+}
+
+.chapter-art.ready:hover .chapter-image {
+  filter: saturate(1.04) contrast(1.04);
+  transform: scale(1.018);
+}
+
+.chapter-art.waiting .chapter-image {
+  filter: grayscale(0.8) opacity(0.52);
 }
 
 .sun-disc {
@@ -1823,9 +1992,9 @@ a:focus-visible {
   background: rgba(248, 244, 235, 0.89);
   color: var(--ink);
   font-family: var(--mono);
-  font-size: 8px;
-  font-weight: 650;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
 }
 
 .chapter-prompt {
@@ -1853,7 +2022,7 @@ a:focus-visible {
   margin: 8px 0 11px;
   font-family: var(--display);
   font-size: 24px;
-  font-weight: 450;
+  font-weight: 400;
   line-height: 1.15;
 }
 
@@ -1861,7 +2030,7 @@ a:focus-visible {
 .note-card blockquote {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.65;
 }
 
@@ -1873,8 +2042,8 @@ a:focus-visible {
 .note-card-head > span {
   color: var(--ink-faint);
   font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  letter-spacing: 0.07em;
 }
 
 .source-note blockquote {
@@ -1913,9 +2082,9 @@ a:focus-visible {
   background: transparent;
   cursor: pointer;
   font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 650;
-  letter-spacing: 0.11em;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
 }
 
 .prototype-controls-body {
@@ -1926,7 +2095,7 @@ a:focus-visible {
 .prototype-controls-body p {
   margin: 0 0 12px;
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .outcome-options {
@@ -1967,8 +2136,8 @@ a:focus-visible {
   border-top: 1px solid var(--ink);
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
 
 .modal-backdrop {
@@ -2012,15 +2181,15 @@ a:focus-visible {
   border-bottom: 0;
   color: var(--ink-soft);
   font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  letter-spacing: 0.07em;
 }
 
 .manuscript-modal h2 {
   margin: 4px 0 0;
   font-family: var(--display);
   font-size: 26px;
-  font-weight: 450;
+  font-weight: 400;
 }
 
 .modal-close {
@@ -2080,23 +2249,42 @@ a:focus-visible {
   color: var(--paper);
 }
 
-.lightbox-art {
-  display: block;
-  width: 100%;
+.lightbox-image-frame {
+  position: relative;
+  overflow: hidden;
   max-height: 78vh;
   margin: 0 auto;
+  border: 1px solid rgba(248, 244, 235, 0.5);
+  background: #1d1a16;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.36);
 }
 
-.lightbox .portrait-art {
-  width: min(540px, 90vw);
+.lightbox-image-frame.final {
+  width: min(660px, 90vw);
+  aspect-ratio: 3 / 4;
+}
+
+.lightbox-image-frame.portrait {
+  width: min(500px, 90vw);
+  aspect-ratio: 2 / 3;
+}
+
+.lightbox-image-frame img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
 }
 
 .lightbox > p {
   margin: 9px 0 0;
   color: var(--paper);
   font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  letter-spacing: 0.08em;
   text-align: center;
   text-transform: uppercase;
 }
@@ -2147,7 +2335,21 @@ a:focus-visible {
   }
 
   .login-story {
+    width: calc(100% - 210px);
     margin: 52px 0 20px;
+  }
+
+  .login-plate-gallery {
+    top: 62px;
+    right: 30px;
+    bottom: auto;
+    width: 260px;
+    height: 230px;
+    opacity: 0.54;
+  }
+
+  .login-plate-gallery span {
+    border-width: 3px;
   }
 
   .login-story h1 {
@@ -2193,13 +2395,6 @@ a:focus-visible {
     display: none;
   }
 
-  .edition-strip span:nth-of-type(4),
-  .edition-strip span:nth-of-type(5),
-  .edition-strip span:nth-of-type(6),
-  .edition-strip span:nth-of-type(7) {
-    display: none;
-  }
-
   .library-intro,
   .new-project-header {
     gap: 36px;
@@ -2240,6 +2435,15 @@ a:focus-visible {
     width: 100%;
   }
 
+  .commission-plate {
+    height: 230px;
+  }
+
+  .library-feature-plate {
+    width: min(100%, 680px);
+    height: 230px;
+  }
+
   .studio-notes {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -2256,7 +2460,7 @@ a:focus-visible {
 
 @media (max-width: 760px) {
   body {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .login-editorial {
@@ -2269,7 +2473,17 @@ a:focus-visible {
   }
 
   .login-story {
+    z-index: 3;
+    width: 100%;
     margin: 45px 0 0;
+  }
+
+  .login-plate-gallery {
+    top: 68px;
+    right: -20px;
+    width: 48%;
+    height: 172px;
+    opacity: 0.28;
   }
 
   .login-story h1 {
@@ -2328,21 +2542,16 @@ a:focus-visible {
     padding: 10px 16px;
   }
 
-  .edition-strip {
-    justify-content: flex-start;
-    padding: 7px 16px;
-  }
-
-  .edition-strip span:nth-of-type(n + 4) {
-    display: none;
-  }
-
   .page-shell {
     width: calc(100% - 32px);
   }
 
   .library-intro {
     padding: 50px 0 38px;
+  }
+
+  .library-feature-plate {
+    height: 210px;
   }
 
   .library-intro-copy p,
@@ -2368,8 +2577,13 @@ a:focus-visible {
   }
 
   .project-title-block {
-    gap: 7px;
-    grid-template-columns: 1fr;
+    gap: 12px;
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .project-thumbnail {
+    width: 52px;
+    height: 66px;
   }
 
   .project-title-block strong {
@@ -2385,8 +2599,8 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .empty-mark {
-    max-width: 230px;
+  .empty-plate {
+    min-height: 245px;
   }
 
   .new-project-header {
@@ -2395,6 +2609,10 @@ a:focus-visible {
 
   .commission-form {
     padding-top: 40px;
+  }
+
+  .commission-plate {
+    height: 190px;
   }
 
   .file-drop {
