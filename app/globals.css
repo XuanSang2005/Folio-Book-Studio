@@ -784,34 +784,37 @@ a:focus-visible {
   position: relative;
   display: grid;
   overflow: hidden;
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  box-shadow: 0 20px 48px rgba(28, 27, 24, 0.14);
-  color: var(--paper-bright);
+  border: 1px solid rgba(69, 89, 72, 0.48);
+  background: #dce1d7;
+  color: var(--ink);
   grid-template-columns: repeat(4, 1fr);
+}
+
+.ledger-summary::before {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--moss) 0 74%, var(--gradion) 74% 100%);
+  content: "";
+  pointer-events: none;
 }
 
 .ledger-summary > div {
   display: flex;
-  min-height: 104px;
+  min-height: 98px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: 22px 24px;
-  border-right: 1px solid rgba(248, 244, 235, 0.18);
-  background: rgba(255, 255, 255, 0.015);
-}
-
-.ledger-summary > div:nth-child(2) {
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.ledger-summary > div:nth-child(3) {
-  background: rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(69, 89, 72, 0.24);
+  background: transparent;
 }
 
 .ledger-summary > div:nth-child(4) {
-  background: var(--gradion-dark);
+  background: rgba(230, 95, 42, 0.11);
 }
 
 .ledger-summary > div:last-child {
@@ -831,20 +834,31 @@ a:focus-visible {
 }
 
 .ledger-summary span {
-  color: rgba(248, 244, 235, 0.68);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: rgba(28, 27, 24, 0.62);
   font-size: 11px;
 }
 
+.ledger-summary span::before {
+  width: 12px;
+  height: 2px;
+  background: var(--gradion);
+  content: "";
+}
+
 .ledger-summary strong {
-  color: var(--paper-bright);
+  color: var(--ink);
   font-family: var(--display);
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 400;
   letter-spacing: -0.02em;
 }
 
-.ledger-summary > div:nth-child(3) strong {
-  color: #ff9b76;
+.ledger-summary > div:nth-child(3) strong,
+.ledger-summary > div:nth-child(4) strong {
+  color: var(--gradion-dark);
 }
 
 .project-ledger {
@@ -2560,7 +2574,7 @@ a:focus-visible {
   }
 
   .ledger-summary > div:nth-child(-n + 2) {
-    border-bottom: 1px solid rgba(248, 244, 235, 0.18);
+    border-bottom: 1px solid rgba(69, 89, 72, 0.24);
   }
 
   .ledger-summary > div {
