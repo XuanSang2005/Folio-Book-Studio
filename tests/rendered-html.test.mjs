@@ -82,8 +82,6 @@ test("prototype source covers the required product states", async () => {
     "folio-mascot.png",
     "folio-mascot-loop.webp",
     "prefers-reduced-motion: no-preference",
-    "Pause mascot animation",
-    "Play mascot animation",
     "Upload manuscript",
     "source-dialog",
     "aria-haspopup=\"dialog\"",

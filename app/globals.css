@@ -1462,38 +1462,6 @@ a:focus-visible {
   object-position: center bottom;
 }
 
-.mascot-motion-toggle {
-  position: absolute;
-  right: -4px;
-  bottom: -16px;
-  z-index: 2;
-  display: grid;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  place-items: center;
-  border: 1px solid rgba(164, 58, 22, 0.28);
-  border-radius: 50%;
-  background: var(--paper-bright);
-  color: var(--gradion-dark);
-  cursor: pointer;
-  font-family: var(--sans);
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 1;
-  transition: background 160ms var(--ease), transform 160ms var(--ease);
-}
-
-.mascot-motion-toggle:hover {
-  background: rgba(230, 95, 42, 0.1);
-  transform: translateY(-1px);
-}
-
-.mascot-motion-toggle:focus-visible {
-  outline: 2px solid var(--gradion);
-  outline-offset: 2px;
-}
-
 .title-input-row input:not(:placeholder-shown) + .title-field-mascot {
   opacity: 0;
   transform: translateY(2px) scale(0.96);
@@ -3730,10 +3698,6 @@ a:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mascot-motion-toggle {
-    display: none;
-  }
-
   .title-field-mascot {
     transition: none;
   }

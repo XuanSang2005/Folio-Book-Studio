@@ -211,7 +211,6 @@ export default function BookStudioPrototype() {
   const [demoOutcome, setDemoOutcome] = useState<DemoOutcome>("normal");
   const [prototypePanel, setPrototypePanel] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [mascotPaused, setMascotPaused] = useState(false);
   const [newText, setNewText] = useState("");
   const [fileName, setFileName] = useState("");
   const [newTitleError, setNewTitleError] = useState("");
@@ -957,19 +956,16 @@ export default function BookStudioPrototype() {
                         placeholder="The Secret Garden — Illustrated Edition"
                       />
                       {!newTitle ? (
-                        <span className="title-mascot-controls">
-                          <picture className="title-field-mascot" id="volume-title-mascot">
-                            {!mascotPaused ? (
-                              <source
-                                srcSet="/illustrations/folio-mascot-loop.webp"
-                                type="image/webp"
-                                media="(prefers-reduced-motion: no-preference)"
-                              />
-                            ) : null}
+                        <span className="title-mascot-controls" aria-hidden="true">
+                          <picture className="title-field-mascot">
+                            <source
+                              srcSet="/illustrations/folio-mascot-loop.webp"
+                              type="image/webp"
+                              media="(prefers-reduced-motion: no-preference)"
+                            />
                             <img
                               src="/illustrations/folio-mascot.png"
                               alt=""
-                              aria-hidden="true"
                               width="109"
                               height="144"
                               loading="lazy"
@@ -977,20 +973,6 @@ export default function BookStudioPrototype() {
                               fetchPriority="low"
                             />
                           </picture>
-                          <button
-                            type="button"
-                            className="mascot-motion-toggle"
-                            aria-controls="volume-title-mascot"
-                            aria-label={mascotPaused ? "Play mascot animation" : "Pause mascot animation"}
-                            onMouseDown={(event) => event.preventDefault()}
-                            onClick={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              setMascotPaused((paused) => !paused);
-                            }}
-                          >
-                            <span aria-hidden="true">{mascotPaused ? "▶" : "Ⅱ"}</span>
-                          </button>
                         </span>
                       ) : null}
                     </span>
