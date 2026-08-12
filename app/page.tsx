@@ -210,6 +210,7 @@ export default function BookStudioPrototype() {
   const [artDirection, setArtDirection] = useState("");
   const [demoOutcome, setDemoOutcome] = useState<DemoOutcome>("normal");
   const [prototypePanel, setPrototypePanel] = useState(false);
+  const [restartConfirm, setRestartConfirm] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newText, setNewText] = useState("");
   const [fileName, setFileName] = useState("");
@@ -593,6 +594,7 @@ export default function BookStudioPrototype() {
     }));
     setArtDirection("");
     setDemoOutcome("normal");
+    setRestartConfirm(false);
     setPrototypePanel(false);
   }
 
@@ -1104,6 +1106,13 @@ export default function BookStudioPrototype() {
     const showCharacters = activeProject.completedSteps >= 2 || (activeProject.completedSteps === 1 && running);
     const showChapter = activeProject.completedSteps >= 4;
     const complete = activeProject.completedSteps === STEPS.length;
+    const canRestart = !running && (
+      activeProject.completedSteps > 0 ||
+      activeProject.stepState !== "idle" ||
+      Boolean(activeProject.style) ||
+      activeProject.characters.length > 0 ||
+      Boolean(activeProject.chapter)
+    );
     const studioStateLabel = complete
       ? "All five illustration stages complete"
       : activeProject.stepState === "failed"
@@ -1128,10 +1137,10 @@ export default function BookStudioPrototype() {
             <p className="project-byline">Created {formatDate(activeProject.createdAt)} · {userName} · {wordCount(activeProject.bookText).toLocaleString()} words</p>
             <button className="project-manuscript-link" onClick={openManuscript}>Read full manuscript <span aria-hidden="true">↗</span></button>
           </div>
-          <figure className="project-cover">
-            <img src={projectPlateSrc(activeProject)} alt="" width="490" height="976" decoding="async" />
+          <figure className="project-cover" aria-hidden="true">
+            <img src="/illustrations/studio-new-triptych.webp" alt="" width="1536" height="1024" decoding="async" fetchPriority="high" />
             <figcaption>
-              <span>REFERENCE PLATE · {activeProject.volume}</span>
+              <span>STUDIO REFERENCE · VISUAL RANGE</span>
               <strong>{currentStep ? `STAGE ${currentStep.roman} · ${currentStep.label.toUpperCase()}` : "FOLIO COMPLETE"}</strong>
             </figcaption>
             <span className={`status-stamp status-${projectStatus(activeProject).toLowerCase().replace(" ", "-")}`}>{projectStatus(activeProject)}</span>
@@ -1246,23 +1255,61 @@ export default function BookStudioPrototype() {
               <h3>Uploaded once. Reused throughout.</h3>
               <p>The production app chains context between stages, enforces 2 character / 1 chapter caps server-side, and never auto-retries.</p>
             </section>
-            <section className="prototype-controls">
-              <button className="prototype-controls-toggle" onClick={() => setPrototypePanel((current) => !current)} aria-expanded={prototypePanel} aria-controls="prototype-controls-body">
-                <span>PROTOTYPE CONTROLS</span><span>{prototypePanel ? "−" : "+"}</span>
-              </button>
-              {prototypePanel ? (
-                <div className="prototype-controls-body" id="prototype-controls-body">
-                  <p>Choose the outcome of the next generation to inspect required states.</p>
-                  <div className="outcome-options">
-                    {(["normal", "fail", "stuck"] as DemoOutcome[]).map((outcome) => (
-                      <button key={outcome} aria-pressed={demoOutcome === outcome} className={demoOutcome === outcome ? "selected" : ""} onClick={() => setDemoOutcome(outcome)}>{outcome === "normal" ? "Normal" : outcome === "fail" ? "Fail next" : "Interrupt next"}</button>
-                    ))}
-                  </div>
-                  <button className="text-link danger-link" onClick={restartVolume}>Restart this volume at Stage I</button>
-                </div>
-              ) : null}
-            </section>
           </aside>
+
+          <section className={`prototype-controls${prototypePanel ? " open" : ""}`}>
+            <button
+              className="prototype-controls-toggle"
+              id="prototype-controls-toggle"
+              onClick={() => {
+                setPrototypePanel((current) => !current);
+                setRestartConfirm(false);
+              }}
+              aria-expanded={prototypePanel}
+              aria-controls="prototype-controls-body"
+            >
+              <span className="prototype-controls-title">
+                <small>TEST PRESS · SIMULATION</small>
+                <strong id="prototype-controls-title">Prototype controls</strong>
+              </span>
+              <span className="prototype-controls-icon" aria-hidden="true">{prototypePanel ? "−" : "+"}</span>
+            </button>
+            {prototypePanel ? (
+              <div className="prototype-controls-body" id="prototype-controls-body" role="region" aria-labelledby="prototype-controls-title">
+                <div className="prototype-control-intro">
+                  <span aria-hidden="true">01</span>
+                  <div>
+                    <strong>Next generation outcome</strong>
+                    <p>Choose one state to inspect. The test press returns to Normal after that generation.</p>
+                  </div>
+                </div>
+                <div className="outcome-options" role="group" aria-label="Next generation outcome">
+                  {(["normal", "fail", "stuck"] as DemoOutcome[]).map((outcome) => (
+                    <button key={outcome} disabled={running} aria-pressed={demoOutcome === outcome} className={demoOutcome === outcome ? "selected" : ""} onClick={() => setDemoOutcome(outcome)}>
+                      <span>{outcome === "normal" ? "Normal" : outcome === "fail" ? "Fail next" : "Interrupt next"}</span>
+                      <small>{outcome === "normal" ? "Successful run" : outcome === "fail" ? "Error state" : "Recovery state"}</small>
+                    </button>
+                  ))}
+                </div>
+                <div className="prototype-restart">
+                  {!restartConfirm ? (
+                    <>
+                      <span>RESET PIPELINE</span>
+                      <button className="text-link danger-link" disabled={!canRestart} onClick={() => setRestartConfirm(true)}>Restart this volume at Stage I <i aria-hidden="true">↻</i></button>
+                    </>
+                  ) : (
+                    <div className="restart-confirm" role="group" aria-label="Confirm volume restart">
+                      <p>Generated stages will be removed. The title and manuscript stay safe.</p>
+                      <div>
+                        <button className="restart-cancel" onClick={() => setRestartConfirm(false)}>Cancel</button>
+                        <button className="restart-confirm-button" onClick={restartVolume}>Restart from Stage I</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </section>
         </div>
       </main>
     );

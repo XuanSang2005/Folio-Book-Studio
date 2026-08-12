@@ -79,6 +79,7 @@ test("prototype source covers the required product states", async () => {
     "commission-desk",
     "pipeline-ledger",
     "project-cover",
+    "studio-new-triptych.webp",
     "studio-progress",
     "title-input-row",
     "folio-mascot.png",
