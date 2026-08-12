@@ -2499,13 +2499,28 @@ a:focus-visible {
   line-height: 1.6;
 }
 
+.chapter-folio-card {
+  display: grid;
+  min-height: clamp(300px, 26vw, 380px);
+  max-height: 380px;
+  overflow: hidden;
+  border-top: 1px solid var(--rule-dark);
+  border-bottom: 1px solid var(--rule-dark);
+  border-radius: 0 24px 0 0;
+  background:
+    linear-gradient(145deg, rgba(185, 134, 53, 0.09), transparent 58%),
+    rgba(248, 244, 235, 0.52);
+  grid-template-columns: minmax(280px, 0.72fr) minmax(340px, 1fr);
+}
+
 .chapter-art {
   position: relative;
   display: block;
   width: 100%;
+  height: clamp(300px, 26vw, 380px);
   overflow: hidden;
-  aspect-ratio: 16 / 9;
-  border: 1px solid var(--rule-dark);
+  border: 0;
+  border-right: 1px solid var(--rule);
   background: #bd9c72;
   cursor: zoom-in;
 }
@@ -2536,7 +2551,17 @@ a:focus-visible {
 }
 
 .chapter-art.waiting .chapter-image {
-  filter: grayscale(0.8) opacity(0.52);
+  filter: grayscale(0.82) opacity(0.32);
+}
+
+.chapter-art.waiting::after {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 18px, rgba(248, 244, 235, 0.16) 19px 20px),
+    rgba(235, 226, 211, 0.12);
+  content: "";
+  pointer-events: none;
 }
 
 .sun-disc {
@@ -2612,7 +2637,6 @@ a:focus-visible {
 .figure-one { left: 38%; }
 .figure-two { left: 46%; bottom: 26%; height: 15%; background: var(--oxblood); }
 
-.chapter-awaits,
 .chapter-ready-label {
   position: absolute;
   right: 14px;
@@ -2626,14 +2650,108 @@ a:focus-visible {
   letter-spacing: 0.07em;
 }
 
+.chapter-awaiting {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 180px;
+  place-items: center;
+  gap: 6px;
+  color: var(--ink-soft);
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.chapter-awaiting i {
+  position: relative;
+  display: grid;
+  width: 110px;
+  height: 84px;
+  place-items: center;
+  margin-bottom: 8px;
+  border: 1px solid rgba(28, 27, 24, 0.36);
+  border-radius: 50%;
+  color: var(--gradion-dark);
+  font-family: var(--display);
+  font-size: 36px;
+  font-style: italic;
+}
+
+.chapter-awaiting i::after {
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(28, 27, 24, 0.14);
+  border-radius: inherit;
+  content: "";
+}
+
+.chapter-awaiting strong,
+.chapter-awaiting small {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.chapter-awaiting small {
+  color: var(--ink-faint);
+  font-size: 8px;
+}
+
+.chapter-brief {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: clamp(24px, 3vw, 44px);
+}
+
+.chapter-brief-meta,
+.chapter-brief-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.chapter-brief > .kicker {
+  margin-top: auto;
+}
+
+.chapter-brief h3 {
+  margin: 9px 0 12px;
+  font-family: var(--display);
+  font-size: clamp(30px, 3vw, 44px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.04;
+}
+
 .chapter-prompt {
-  margin: 12px 0 0;
-  padding-left: 20%;
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0 0 24px;
+  padding-left: 0;
   color: var(--ink-soft);
   font-family: var(--display);
-  font-size: 16px;
+  font-size: 15px;
   font-style: italic;
   line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.chapter-brief-foot {
+  margin-top: auto;
+  padding-top: 13px;
+  border-top: 1px solid var(--rule);
 }
 
 .studio-notes {
@@ -4185,7 +4303,37 @@ a:focus-visible {
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 760px) {
+  .chapter-folio-card {
+    display: block;
+    max-height: none;
+    border-right: 1px solid var(--rule-dark);
+    border-left: 1px solid var(--rule-dark);
+    border-radius: 0 18px 0 0;
+  }
+
+  .chapter-art {
+    height: clamp(220px, 68vw, 260px);
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .chapter-image {
+    object-position: center 35%;
+  }
+
+  .chapter-brief {
+    padding: 24px 20px;
+  }
+
+  .chapter-brief > .kicker {
+    margin-top: 30px;
+  }
+
+  .chapter-prompt {
+    -webkit-line-clamp: 4;
+  }
+
   .portrait-card {
     display: block;
     min-height: 0;

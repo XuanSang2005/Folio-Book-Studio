@@ -1225,11 +1225,21 @@ export default function BookStudioPrototype() {
             {showChapter ? (
               <section className="artifact-section chapter-section">
                 <div className="section-heading-row"><div><p className="kicker">SCENE BLUEPRINT · 1 OF 1 SLOT USED</p><h2>{activeProject.chapter?.name ?? SAMPLE_CHAPTER.name}</h2></div><span>CHAPTER PLATE</span></div>
-                <button className={`chapter-art ${complete ? "ready" : "waiting"}`} onClick={(event) => complete && openLightbox(`${activeProject.chapter?.name ?? SAMPLE_CHAPTER.name} · Final illustration`, event)} disabled={!complete}>
-                  <img className="chapter-image" src={projectPlateSrc(activeProject)} alt="" width="490" height="976" loading="lazy" decoding="async" />
-                  {!complete ? <span className="chapter-awaits">FINAL PLATE AWAITS STAGE V</span> : <span className="chapter-ready-label">FINAL PLATE · {(activeProject.chapter?.name ?? SAMPLE_CHAPTER.name).toUpperCase()}</span>}
-                </button>
-                <p className="chapter-prompt">{activeProject.chapter?.prompt ?? SAMPLE_CHAPTER.prompt}</p>
+                <div className="chapter-folio-card">
+                  <button className={`chapter-art ${complete ? "ready" : "waiting"}`} aria-label={complete ? `Open final illustration for ${activeProject.chapter?.name ?? SAMPLE_CHAPTER.name}` : "Final illustration awaits Stage V"} onClick={(event) => complete && openLightbox(`${activeProject.chapter?.name ?? SAMPLE_CHAPTER.name} · Final illustration`, event)} disabled={!complete}>
+                    <img className="chapter-image" src={projectPlateSrc(activeProject)} alt="" width="490" height="976" loading="lazy" decoding="async" />
+                    {!complete ? (
+                      <span className="chapter-awaiting" aria-hidden="true"><i>V</i><strong>Final illustration</strong><small>Awaits Stage V</small></span>
+                    ) : <span className="chapter-ready-label">FINAL PLATE · {(activeProject.chapter?.name ?? SAMPLE_CHAPTER.name).toUpperCase()}</span>}
+                  </button>
+                  <div className="chapter-brief">
+                    <div className="chapter-brief-meta"><span>SCENE 01</span><span>{complete ? "GENERATED" : "BLUEPRINT READY"}</span></div>
+                    <p className="kicker">ILLUSTRATION BRIEF</p>
+                    <h3>Compose the final plate.</h3>
+                    <p className="chapter-prompt">{activeProject.chapter?.prompt ?? SAMPLE_CHAPTER.prompt}</p>
+                    <div className="chapter-brief-foot"><span>CAST {String(Math.min(activeProject.characters.length, 2)).padStart(2, "0")}</span><span>SCENE 01</span><span>{complete ? "PLATE READY" : "PLATE PENDING"}</span></div>
+                  </div>
+                </div>
               </section>
             ) : null}
 
