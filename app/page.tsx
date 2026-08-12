@@ -1078,26 +1078,24 @@ export default function BookStudioPrototype() {
 
     return (
       <main className="page-shell studio-page">
-        <header className="project-heading">
+        <header className="project-heading project-docket">
+          <div className="project-docket-meta">
+            <span>VOLUME</span>
+            <strong>{activeProject.volume.replace("VOL. ", "")}</strong>
+            <small>WORKING EDITION</small>
+          </div>
           <div className="project-heading-copy">
-            <div className="project-folio-line">
-              <span>VOL. {activeProject.volume.replace("VOL. ", "")}</span>
-              <i aria-hidden="true" />
-              <span>WORKING EDITION</span>
-            </div>
             <p className="kicker">ACTIVE COMMISSION · {projectStatus(activeProject).toUpperCase()}</p>
             <h1>{activeProject.title}</h1>
-            <p className="project-byline">Created {formatDate(activeProject.createdAt)} · {userName} · {wordCount(activeProject.bookText).toLocaleString()} words</p>
+            <p className="project-byline">Created {formatDate(activeProject.createdAt)} · {userName}</p>
+          </div>
+          <div className="project-docket-action">
+            <div className="project-docket-source">
+              <span>SOURCE MANUSCRIPT</span>
+              <strong>{wordCount(activeProject.bookText).toLocaleString()} words · uploaded once</strong>
+            </div>
             <button className="project-manuscript-link" onClick={openManuscript}>Read full manuscript <span aria-hidden="true">↗</span></button>
           </div>
-          <figure className="project-cover" aria-hidden="true">
-            <img src="/illustrations/studio-new-triptych.webp" alt="" width="1536" height="1024" decoding="async" fetchPriority="high" />
-            <figcaption>
-              <span>STUDIO REFERENCE · VISUAL RANGE</span>
-              <strong>{currentStep ? `STAGE ${currentStep.roman} · ${currentStep.label.toUpperCase()}` : "FOLIO COMPLETE"}</strong>
-            </figcaption>
-            <span className={`status-stamp status-${projectStatus(activeProject).toLowerCase().replace(" ", "-")}`}>{projectStatus(activeProject)}</span>
-          </figure>
         </header>
 
         <nav className="studio-progress" aria-label="Illustration pipeline progress">
@@ -1220,6 +1218,24 @@ export default function BookStudioPrototype() {
             </section>
           </aside>
         </div>
+
+        <figure className="studio-closing-folio">
+          <div className="studio-closing-art">
+            <img
+              src="/illustrations/studio-new-triptych.webp"
+              alt="A storybook triptych of a candlelit library, an enchanted white stag, and an astronomer releasing paper birds"
+              width="1536"
+              height="1024"
+              loading="lazy"
+              decoding="async"
+            />
+            <span aria-hidden="true">ENDPLATE</span>
+          </div>
+          <figcaption>
+            <span>STUDIO ENDPLATE · REFERENCE IMAGERY</span>
+            <strong>{activeProject.volume} · VISUAL ARCHIVE</strong>
+          </figcaption>
+        </figure>
       </main>
     );
   }

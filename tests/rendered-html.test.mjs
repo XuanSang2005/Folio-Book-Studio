@@ -76,7 +76,8 @@ test("prototype source covers the required product states", async () => {
     "commission-actions",
     "commission-desk",
     "pipeline-ledger",
-    "project-cover",
+    "project-docket",
+    "studio-closing-folio",
     "studio-new-triptych.webp",
     "studio-progress",
     "title-input-row",
@@ -106,6 +107,7 @@ test("prototype source covers the required product states", async () => {
   assert.doesNotMatch(page, /account-seal/);
   assert.doesNotMatch(page, /Google Drive|Slack/);
   assert.doesNotMatch(page, /Prototype controls|TEST PRESS|RESET PIPELINE/i);
+  assert.doesNotMatch(page, /project-cover/i);
   assert.match(styles, /folio-diptych-v1\.jpg/i);
   assert.match(styles, /\.commission-input-grid\s*\{[^}]*align-items:\s*stretch;[^}]*grid-template-columns:\s*repeat\(2,/s);
   assert.match(styles, /\.pipeline-ledger\s*>\s*header\s*\{[^}]*border-bottom:\s*0;/s);
