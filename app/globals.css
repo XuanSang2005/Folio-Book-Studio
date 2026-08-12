@@ -2562,7 +2562,7 @@ a:focus-visible {
 
 .studio-notes {
   display: grid;
-  align-items: stretch;
+  align-items: start;
   gap: clamp(24px, 3.2vw, 44px);
   margin-top: 42px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2571,7 +2571,7 @@ a:focus-visible {
 .note-card {
   position: relative;
   min-width: 0;
-  height: 100%;
+  height: auto;
   margin-top: 0;
   padding: 22px 0 4px;
   border-top: 1px solid var(--rule-dark);
@@ -2590,6 +2590,10 @@ a:focus-visible {
 
 .source-note::before {
   background: var(--oxblood);
+}
+
+.source-note {
+  margin-top: 26px;
 }
 
 .note-card h3 {
@@ -2631,6 +2635,7 @@ a:focus-visible {
 .context-note {
   position: relative;
   overflow: hidden;
+  margin-top: 52px;
 }
 
 .context-note::before {
@@ -3562,8 +3567,9 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .note-card {
-    height: auto;
+  .source-note,
+  .context-note {
+    margin-top: 0;
   }
 }
 
