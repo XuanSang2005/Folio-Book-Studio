@@ -1104,42 +1104,65 @@ export default function BookStudioPrototype() {
     const showCharacters = activeProject.completedSteps >= 2 || (activeProject.completedSteps === 1 && running);
     const showChapter = activeProject.completedSteps >= 4;
     const complete = activeProject.completedSteps === STEPS.length;
+    const studioStateLabel = complete
+      ? "All five illustration stages complete"
+      : activeProject.stepState === "failed"
+        ? `Stage ${currentStep?.roman} failed`
+        : activeProject.stepState === "stuck"
+          ? `Stage ${currentStep?.roman} interrupted`
+          : running
+            ? `Stage ${currentStep?.roman} in progress`
+            : `Stage ${currentStep?.roman} ready`;
 
     return (
       <main className="page-shell studio-page">
-        <div className="studio-return-row">
-          <button className="back-link" onClick={() => setView("library")}>← Return to the library</button>
-          <button className="secondary-button" onClick={openManuscript}>Read full manuscript</button>
-        </div>
-
         <header className="project-heading">
-          <div className="volume-monogram"><span>{activeProject.volume.replace("VOL. ", "")}</span><small>VOLUME</small></div>
-          <div>
+          <div className="project-heading-copy">
+            <div className="project-folio-line">
+              <span>VOL. {activeProject.volume.replace("VOL. ", "")}</span>
+              <i aria-hidden="true" />
+              <span>WORKING EDITION</span>
+            </div>
             <p className="kicker">ACTIVE COMMISSION · {projectStatus(activeProject).toUpperCase()}</p>
             <h1>{activeProject.title}</h1>
             <p className="project-byline">Created {formatDate(activeProject.createdAt)} · {userName} · {wordCount(activeProject.bookText).toLocaleString()} words</p>
+            <button className="project-manuscript-link" onClick={openManuscript}>Read full manuscript <span aria-hidden="true">↗</span></button>
           </div>
-          <span className={`status-stamp status-${projectStatus(activeProject).toLowerCase().replace(" ", "-")}`}>{projectStatus(activeProject)}</span>
+          <figure className="project-cover">
+            <img src={projectPlateSrc(activeProject)} alt="" width="490" height="976" decoding="async" />
+            <figcaption>
+              <span>REFERENCE PLATE · {activeProject.volume}</span>
+              <strong>{currentStep ? `STAGE ${currentStep.roman} · ${currentStep.label.toUpperCase()}` : "FOLIO COMPLETE"}</strong>
+            </figcaption>
+            <span className={`status-stamp status-${projectStatus(activeProject).toLowerCase().replace(" ", "-")}`}>{projectStatus(activeProject)}</span>
+          </figure>
         </header>
 
-        <ol className="studio-stepper" aria-label="Illustration pipeline">
-          {STEPS.map((step, index) => {
-            const done = index < activeProject.completedSteps;
-            const current = index === activeProject.completedSteps;
-            const state = done ? "complete" : current ? activeProject.stepState : "pending";
-            return (
-              <li key={step.roman} className={`${done ? "done" : current ? "current" : "pending"} ${state}`} aria-current={current ? "step" : undefined}>
-                <span className="step-roman">{done ? "✓" : step.roman}</span>
-                <span><small>{step.eyebrow}</small><strong>{step.label}</strong></span>
-                <em>{done ? "COMPLETE" : current ? activeProject.stepState === "idle" ? "READY" : activeProject.stepState.toUpperCase() : "PENDING"}</em>
-              </li>
-            );
-          })}
-        </ol>
+        <nav className="studio-progress" aria-label="Illustration pipeline progress">
+          <div className="studio-progress-heading">
+            <span>EDITION PIPELINE</span>
+            <strong>{studioStateLabel}</strong>
+          </div>
+          <ol className="studio-stepper">
+            {STEPS.map((step, index) => {
+              const done = index < activeProject.completedSteps;
+              const current = index === activeProject.completedSteps;
+              const state = done ? "complete" : current ? activeProject.stepState : "pending";
+              const visibleState = done ? "Complete" : current ? activeProject.stepState === "idle" ? "Ready" : activeProject.stepState : "Pending";
+              return (
+                <li key={step.roman} className={`${done ? "done" : current ? "current" : "pending"} ${state}`} aria-current={current ? "step" : undefined} aria-label={`Step ${index + 1} of 5, ${step.label}, ${visibleState}`}>
+                  <span className="step-roman">{done ? "✓" : step.roman}</span>
+                  <span><small>{step.eyebrow}</small><strong>{step.label}</strong></span>
+                  <em>{visibleState.toUpperCase()}</em>
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
 
         <div className="studio-grid">
           <section className="studio-workbench">
-            <div className={`action-panel action-${activeProject.stepState}`} aria-live="polite">
+            <div className={`action-panel action-${activeProject.stepState}`} aria-busy={running}>
               <div className="action-index">{complete ? "✓" : `0${currentIndex + 1}`}</div>
               <div className="action-content">
                 {complete ? (
@@ -1181,6 +1204,7 @@ export default function BookStudioPrototype() {
                   </>
                 )}
               </div>
+              <p className="studio-live-status" role={activeProject.stepState === "failed" ? "alert" : "status"} aria-live={activeProject.stepState === "failed" ? "assertive" : "polite"} aria-atomic="true">{studioStateLabel}</p>
             </div>
 
             {showChapter ? (
@@ -1204,7 +1228,8 @@ export default function BookStudioPrototype() {
             ) : null}
           </section>
 
-          <aside className="studio-notes">
+          <aside className="studio-notes" aria-labelledby="project-reference-title">
+            <h2 className="visually-hidden" id="project-reference-title">Project reference</h2>
             <section className="note-card style-note">
               <p className="kicker">ART DIRECTION</p>
               <h3>{activeProject.style ? "The visual grammar" : "Not yet established"}</h3>
@@ -1222,15 +1247,15 @@ export default function BookStudioPrototype() {
               <p>The production app chains context between stages, enforces 2 character / 1 chapter caps server-side, and never auto-retries.</p>
             </section>
             <section className="prototype-controls">
-              <button className="prototype-controls-toggle" onClick={() => setPrototypePanel((current) => !current)} aria-expanded={prototypePanel}>
+              <button className="prototype-controls-toggle" onClick={() => setPrototypePanel((current) => !current)} aria-expanded={prototypePanel} aria-controls="prototype-controls-body">
                 <span>PROTOTYPE CONTROLS</span><span>{prototypePanel ? "−" : "+"}</span>
               </button>
               {prototypePanel ? (
-                <div className="prototype-controls-body">
+                <div className="prototype-controls-body" id="prototype-controls-body">
                   <p>Choose the outcome of the next generation to inspect required states.</p>
                   <div className="outcome-options">
                     {(["normal", "fail", "stuck"] as DemoOutcome[]).map((outcome) => (
-                      <button key={outcome} className={demoOutcome === outcome ? "selected" : ""} onClick={() => setDemoOutcome(outcome)}>{outcome === "normal" ? "Normal" : outcome === "fail" ? "Fail next" : "Interrupt next"}</button>
+                      <button key={outcome} aria-pressed={demoOutcome === outcome} className={demoOutcome === outcome ? "selected" : ""} onClick={() => setDemoOutcome(outcome)}>{outcome === "normal" ? "Normal" : outcome === "fail" ? "Fail next" : "Interrupt next"}</button>
                     ))}
                   </div>
                   <button className="text-link danger-link" onClick={restartVolume}>Restart this volume at Stage I</button>

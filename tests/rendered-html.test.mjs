@@ -78,6 +78,8 @@ test("prototype source covers the required product states", async () => {
     "commission-actions",
     "commission-desk",
     "pipeline-ledger",
+    "project-cover",
+    "studio-progress",
     "title-input-row",
     "folio-mascot.png",
     "folio-mascot-loop.webp",
@@ -101,6 +103,7 @@ test("prototype source covers the required product states", async () => {
   }
 
   assert.doesNotMatch(page, /edition-strip|INTERACTIVE PROTOTYPE|EDITION № 01/);
+  assert.doesNotMatch(page, /Return to the library/i);
   assert.doesNotMatch(page, /account-seal/);
   assert.doesNotMatch(page, /Google Drive|Slack/);
   assert.match(styles, /folio-diptych-v1\.jpg/i);
