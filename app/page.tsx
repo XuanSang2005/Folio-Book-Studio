@@ -211,6 +211,7 @@ export default function BookStudioPrototype() {
   const [demoOutcome, setDemoOutcome] = useState<DemoOutcome>("normal");
   const [prototypePanel, setPrototypePanel] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [mascotPaused, setMascotPaused] = useState(false);
   const [newText, setNewText] = useState("");
   const [fileName, setFileName] = useState("");
   const [newTitleError, setNewTitleError] = useState("");
@@ -941,8 +942,8 @@ export default function BookStudioPrototype() {
                 <div className="commission-panel-index"><span>01</span><small>VOLUME</small></div>
                 <div className="commission-panel-body">
                   <p className="kicker" id="commission-title-heading">NAME THE EDITION</p>
-                  <label className="field field-large" htmlFor="new-volume-title">
-                    <span>Volume title</span>
+                  <div className="field field-large title-field">
+                    <label htmlFor="new-volume-title">Volume title</label>
                     <span className={`title-input-row${titleInvalid ? " invalid" : ""}`}>
                       <input
                         ref={newTitleInputRef}
@@ -956,26 +957,44 @@ export default function BookStudioPrototype() {
                         placeholder="The Secret Garden — Illustrated Edition"
                       />
                       {!newTitle ? (
-                        <picture className="title-field-mascot">
-                          <source
-                            srcSet="/illustrations/folio-mascot-animated.webp"
-                            type="image/webp"
-                            media="(prefers-reduced-motion: no-preference)"
-                          />
-                          <img
-                            src="/illustrations/folio-mascot.png"
-                            alt=""
-                            aria-hidden="true"
-                            width="109"
-                            height="144"
-                            loading="lazy"
-                            decoding="async"
-                            fetchPriority="low"
-                          />
-                        </picture>
+                        <span className="title-mascot-controls">
+                          <picture className="title-field-mascot" id="volume-title-mascot">
+                            {!mascotPaused ? (
+                              <source
+                                srcSet="/illustrations/folio-mascot-loop.webp"
+                                type="image/webp"
+                                media="(prefers-reduced-motion: no-preference)"
+                              />
+                            ) : null}
+                            <img
+                              src="/illustrations/folio-mascot.png"
+                              alt=""
+                              aria-hidden="true"
+                              width="109"
+                              height="144"
+                              loading="lazy"
+                              decoding="async"
+                              fetchPriority="low"
+                            />
+                          </picture>
+                          <button
+                            type="button"
+                            className="mascot-motion-toggle"
+                            aria-controls="volume-title-mascot"
+                            aria-label={mascotPaused ? "Play mascot animation" : "Pause mascot animation"}
+                            onMouseDown={(event) => event.preventDefault()}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              setMascotPaused((paused) => !paused);
+                            }}
+                          >
+                            <span aria-hidden="true">{mascotPaused ? "▶" : "Ⅱ"}</span>
+                          </button>
+                        </span>
                       ) : null}
                     </span>
-                  </label>
+                  </div>
                   <p className="panel-note" id="volume-title-note">Use the title that should appear in your working library.</p>
                   {titleInvalid ? <p className="inline-error" id="new-title-error" role="alert">{newTitleError}</p> : null}
                 </div>
