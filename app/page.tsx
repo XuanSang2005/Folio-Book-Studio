@@ -1078,26 +1078,7 @@ export default function BookStudioPrototype() {
 
     return (
       <main className="page-shell studio-page">
-        <header className="project-heading project-docket">
-          <div className="project-docket-meta">
-            <span>VOLUME</span>
-            <strong>{activeProject.volume.replace("VOL. ", "")}</strong>
-            <small>WORKING EDITION</small>
-          </div>
-          <div className="project-heading-copy">
-            <p className="kicker">ACTIVE COMMISSION · {projectStatus(activeProject).toUpperCase()}</p>
-            <h1>{activeProject.title}</h1>
-            <p className="project-byline">Created {formatDate(activeProject.createdAt)} · {userName}</p>
-          </div>
-          <div className="project-docket-action">
-            <div className="project-docket-source">
-              <span>SOURCE MANUSCRIPT</span>
-              <strong>{wordCount(activeProject.bookText).toLocaleString()} words · uploaded once</strong>
-            </div>
-            <button className="project-manuscript-link" onClick={openManuscript}>Read full manuscript <span aria-hidden="true">↗</span></button>
-          </div>
-        </header>
-
+        <h1 className="visually-hidden">{activeProject.title} · Illustration studio</h1>
         <nav className="studio-progress" aria-label="Illustration pipeline progress">
           <div className="studio-progress-heading">
             <span>EDITION PIPELINE</span>

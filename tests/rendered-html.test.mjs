@@ -53,7 +53,7 @@ test("prototype source covers the required product states", async () => {
     "Portraits",
     "Chapter",
     "Illustration",
-    "Read full manuscript",
+    "Read the complete text",
     "Recover this stage",
     "duplicate execution locked",
     "2 OF 2 SLOTS USED",
@@ -76,7 +76,6 @@ test("prototype source covers the required product states", async () => {
     "commission-actions",
     "commission-desk",
     "pipeline-ledger",
-    "project-docket",
     "studio-closing-folio",
     "studio-new-triptych.webp",
     "studio-progress",
@@ -107,7 +106,7 @@ test("prototype source covers the required product states", async () => {
   assert.doesNotMatch(page, /account-seal/);
   assert.doesNotMatch(page, /Google Drive|Slack/);
   assert.doesNotMatch(page, /Prototype controls|TEST PRESS|RESET PIPELINE/i);
-  assert.doesNotMatch(page, /project-cover/i);
+  assert.doesNotMatch(page, /project-cover|project-docket|project-heading/i);
   assert.match(styles, /folio-diptych-v1\.jpg/i);
   assert.match(styles, /\.commission-input-grid\s*\{[^}]*align-items:\s*stretch;[^}]*grid-template-columns:\s*repeat\(2,/s);
   assert.match(styles, /\.pipeline-ledger\s*>\s*header\s*\{[^}]*border-bottom:\s*0;/s);
