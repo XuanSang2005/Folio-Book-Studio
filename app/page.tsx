@@ -1088,7 +1088,13 @@ export default function BookStudioPrototype() {
             />
           ) : null}
           {generating ? <span className="press-loader"><i />Rendering plate {STEPS[index].roman}</span> : null}
-          {!ready && !generating ? <span className="not-generated">PLATE AWAITS</span> : null}
+          {!ready && !generating ? (
+            <span className="portrait-awaiting" aria-hidden="true">
+              <i>{index === 0 ? "I" : "II"}</i>
+              <strong>Portrait plate</strong>
+              <small>Awaits Stage III</small>
+            </span>
+          ) : null}
         </button>
         <div className="plate-meta"><span>PLATE {index === 0 ? "I" : "II"}</span><span>{ready ? "GENERATED" : generating ? "IN PRESS" : "PENDING"}</span></div>
         <h3>{character.name}</h3>
