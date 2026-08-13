@@ -1,0 +1,279 @@
+{
+  "phase": "after",
+  "baseUrl": "http://localhost:3000",
+  "desktopViewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "mobileViewport": {
+    "width": 390,
+    "height": 844
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "captures": [
+    {
+      "name": "login-desktop-1440x1000.png",
+      "scrollY": 0
+    },
+    {
+      "name": "library-desktop-1440x1000.png",
+      "scrollY": 0
+    },
+    {
+      "name": "new-volume-desktop-1440x1000.png",
+      "scrollY": 0
+    },
+    {
+      "name": "upload-dialog-desktop-1440x1000.png",
+      "scrollY": 302
+    },
+    {
+      "name": "paste-dialog-desktop-1440x1000.png",
+      "scrollY": 830
+    },
+    {
+      "name": "studio-pending-desktop-1440x1000.png",
+      "scrollY": 104
+    },
+    {
+      "name": "studio-running-desktop-1440x1000.png",
+      "scrollY": 471
+    },
+    {
+      "name": "studio-completed-desktop-1440x1000.png",
+      "scrollY": 509
+    },
+    {
+      "name": "studio-desktop-1440x1000.png",
+      "scrollY": 0
+    },
+    {
+      "name": "manuscript-dialog-desktop-1440x1000.png",
+      "scrollY": 1575
+    },
+    {
+      "name": "studio-failed-desktop-1440x1000.png",
+      "scrollY": 0
+    },
+    {
+      "name": "studio-stuck-desktop-1440x1000.png",
+      "scrollY": 0
+    },
+    {
+      "name": "login-mobile-390x844.png",
+      "scrollY": 0
+    },
+    {
+      "name": "library-mobile-390x844.png",
+      "scrollY": 0
+    },
+    {
+      "name": "studio-mobile-390x844.png",
+      "scrollY": 261
+    }
+  ],
+  "assertions": [
+    {
+      "name": "login renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "name validation renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "email validation renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "sample library opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "sample identity stored",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "sample projects stored",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "library view stored",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "library survives reload",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "library has its direct route",
+      "passed": true,
+      "detail": "http://localhost:3000/library"
+    },
+    {
+      "name": "new volume opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "route navigation pushes history",
+      "passed": true,
+      "detail": "http://localhost:3000/volumes/new"
+    },
+    {
+      "name": "browser back returns to library",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "browser forward returns to New Volume",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "browser history preserves the in-memory commission draft",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "upload dialog opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "invalid upload is rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "valid upload creates receipt",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "new project enters studio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "running state renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "completed pipeline survives reload",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "seed studio opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "manuscript dialog opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "direct Library route renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "direct New Volume route renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "direct Studio route renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "failed state renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "failed stage retries",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "stuck state renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "stuck stage recovers",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "sign out returns to login",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "signed-out view survives reload",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile login renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile login has no document overflow",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile library opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile library has no document overflow",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile studio opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile studio has no document overflow",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no page errors",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no failed requests",
+      "passed": true,
+      "detail": "[]"
+    }
+  ]
+}
