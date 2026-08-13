@@ -1,0 +1,187 @@
+{
+  "phase": "before",
+  "baseUrl": "http://localhost:3000",
+  "desktopViewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "mobileViewport": {
+    "width": 390,
+    "height": 844
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "assertions": [
+    {
+      "name": "login renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "name validation renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "email validation renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "sample library opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "sample identity stored",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "sample projects stored",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "library view stored",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "library survives reload",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "baseline navigation remains on one URL",
+      "passed": true,
+      "detail": "http://localhost:3000/"
+    },
+    {
+      "name": "new volume opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "baseline state navigation does not push history",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "upload dialog opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "invalid upload is rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "valid upload creates receipt",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "new project enters studio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "running state renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "completed pipeline survives reload",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "seed studio opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "manuscript dialog opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "failed state renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "failed stage retries",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "stuck state renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "stuck stage recovers",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "sign out returns to login",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "signed-out view survives reload",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile login renders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile login has no document overflow",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile library opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile library has no document overflow",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile studio opens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile studio has no document overflow",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no page errors",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no failed requests",
+      "passed": true,
+      "detail": "[]"
+    }
+  ]
+}
