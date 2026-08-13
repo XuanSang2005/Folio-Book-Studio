@@ -78,3 +78,16 @@ The migrated application intentionally changes the address model to the required
 - No uncaught page errors.
 - No failed network requests.
 - All interaction and persistence assertions in `before/observations.json` passed.
+
+## Migrated verification
+
+- `after/` repeats all 15 accepted screenshots at the identical desktop and mobile viewport sizes.
+- `after/observations.json` records 40 passing assertions with no console errors, uncaught page errors, or failed requests.
+- The migrated address model uses `/login`, `/library`, `/volumes/new`, and `/volumes/$volumeId`; direct navigation and back/forward history were exercised in addition to the baseline transitions.
+- The history check confirms that an in-memory New Volume draft survives browser back and forward navigation.
+- The same localStorage key, snapshot fields, sample data, stage results, and sign-out persistence remain in use.
+- The mobile Login, Library, and Studio checks again found no document-level horizontal overflow.
+
+`comparison.json` contains the raw perceptual pixel result for every full viewport and a second alignment measurement that searches only for a vertical offset. It does not scale, recolor, crop, or otherwise transform either source image. This matters because the baseline used one state-driven `/` document and retained incidental Playwright click/scroll anchoring, while the required router restores scroll per URL. Key desktop views with the same scroll position differ by 2.90–7.35% raw perceptual pixels. Scroll-sensitive Studio frames align to the same composition with a low color delta; their larger raw ratios reflect different document offsets, which are recorded beside every migrated capture.
+
+Visual inspection confirmed the approved type treatment, palette, rules, spacing, cards, dialogs, imagery, responsive collapses, and animation states. The retained custom CSS remains the parity authority while Tailwind adoption proceeds section by section.
