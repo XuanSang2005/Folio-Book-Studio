@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+**/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -13,10 +13,12 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/.vinext/
-/out/
+# generated application output
+**/dist/
+**/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+**/.vite/
 
 # misc
 .DS_Store
@@ -34,7 +36,5 @@ yarn-error.log*
 # vercel
 .vercel
 
-/dist/
-/.wrangler/
 /outputs/
 /work/

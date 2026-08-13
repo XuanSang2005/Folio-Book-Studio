@@ -6,6 +6,7 @@ const { chromium } = await import(playwrightModule);
 
 const baseUrl = process.env.BASE_URL ?? "http://localhost:3000";
 const phase = process.argv[2] ?? "before";
+const routed = phase === "after";
 const outputDirectory = resolve(`docs/baseline/${phase}`);
 const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH || undefined;
 const storageKey = "gradion-folio-prototype-v2";
@@ -21,6 +22,7 @@ const observations = {
   consoleErrors: [],
   pageErrors: [],
   failedRequests: [],
+  captures: [],
   assertions: [],
 };
 
@@ -53,7 +55,6 @@ async function settle(page) {
     await document.fonts.ready;
     await Promise.all(
       [...document.images]
-        .filter((image) => image.getBoundingClientRect().top < window.innerHeight * 1.5)
         .map((image) => image.complete
           ? Promise.resolve()
           : new Promise((resolveImage) => {
@@ -67,6 +68,10 @@ async function settle(page) {
 
 async function screenshot(page, name) {
   await settle(page);
+  observations.captures.push({
+    name,
+    scrollY: await page.evaluate(() => window.scrollY),
+  });
   await page.screenshot({ path: resolve(outputDirectory, name) });
 }
 
@@ -118,15 +123,36 @@ await screenshot(desktop, "library-desktop-1440x1000.png");
 
 await desktop.reload({ waitUntil: "domcontentloaded" });
 await expectVisible(desktop.getByRole("heading", { name: /Your volumes/ }), "library survives reload");
-recordAssertion("baseline navigation remains on one URL", desktop.url() === libraryUrl, desktop.url());
+recordAssertion(
+  routed ? "library has its direct route" : "baseline navigation remains on one URL",
+  routed ? new URL(desktop.url()).pathname === "/library" : desktop.url() === libraryUrl,
+  desktop.url(),
+);
 
 await desktop.getByRole("button", { name: "New volume", exact: true }).click();
 await expectVisible(desktop.getByRole("heading", { name: /Begin a new volume/ }), "new volume opens");
 recordAssertion(
-  "baseline state navigation does not push history",
-  (await desktop.evaluate(() => history.length)) === libraryHistoryLength,
+  routed ? "route navigation pushes history" : "baseline state navigation does not push history",
+  routed
+    ? (await desktop.evaluate(() => history.length)) === libraryHistoryLength + 1
+      && new URL(desktop.url()).pathname === "/volumes/new"
+    : (await desktop.evaluate(() => history.length)) === libraryHistoryLength,
+  desktop.url(),
 );
 await screenshot(desktop, "new-volume-desktop-1440x1000.png");
+
+if (routed) {
+  await desktop.getByLabel("Volume title").fill("Back and forward draft");
+  await desktop.goBack({ waitUntil: "domcontentloaded" });
+  await expectVisible(desktop.getByRole("heading", { name: /Your volumes/ }), "browser back returns to library");
+  await desktop.goForward({ waitUntil: "domcontentloaded" });
+  await expectVisible(desktop.getByRole("heading", { name: /Begin a new volume/ }), "browser forward returns to New Volume");
+  recordAssertion(
+    "browser history preserves the in-memory commission draft",
+    (await desktop.getByLabel("Volume title").inputValue()) === "Back and forward draft",
+  );
+  await desktop.getByLabel("Volume title").fill("");
+}
 
 await desktop.getByRole("button", { name: "Upload manuscript" }).click();
 await expectVisible(desktop.getByRole("dialog", { name: "Bring in the manuscript." }), "upload dialog opens");
@@ -183,6 +209,15 @@ await desktop.getByRole("button", { name: /Read the complete text/ }).click();
 await expectVisible(desktop.getByRole("dialog", { name: /Wind in the Willows/ }), "manuscript dialog opens");
 await screenshot(desktop, "manuscript-dialog-desktop-1440x1000.png");
 await desktop.getByRole("button", { name: "Close manuscript" }).click();
+
+if (routed) {
+  await desktop.goto(`${baseUrl}/library`, { waitUntil: "domcontentloaded" });
+  await expectVisible(desktop.getByRole("heading", { name: /Your volumes/ }), "direct Library route renders");
+  await desktop.goto(`${baseUrl}/volumes/new`, { waitUntil: "domcontentloaded" });
+  await expectVisible(desktop.getByRole("heading", { name: /Begin a new volume/ }), "direct New Volume route renders");
+  await desktop.goto(`${baseUrl}/volumes/riverbank`, { waitUntil: "domcontentloaded" });
+  await expectVisible(desktop.getByRole("heading", { name: "Generate illustration." }), "direct Studio route renders");
+}
 
 await setProjectState(desktop, "riverbank", "failed", "The illustration press returned an error.");
 await expectVisible(desktop.getByRole("heading", { name: "Illustration could not be completed." }), "failed state renders");
