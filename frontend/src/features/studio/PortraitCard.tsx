@@ -1,27 +1,31 @@
+import type { CharacterDto } from "@gradion-folio/contracts";
 import type { MouseEvent } from "react";
-import { STEPS } from "../../lib/demo-store/data";
-import type { Character, Project } from "../../lib/demo-store/types";
 
-type PortraitCardProps = {
-  character: Character;
-  index: number;
-  project: Project;
-  openLightbox: (label: string, event: MouseEvent<HTMLElement>) => void;
+export type LightboxImage = {
+  url: string;
+  label: string;
+  kind: "portrait" | "final";
 };
 
-export function PortraitCard({ character, index, project, openLightbox }: PortraitCardProps) {
-  const ready = project.completedSteps > 2 || project.portraitProgress > index;
-  const generating =
-    project.completedSteps === 2
-    && project.stepState === "running"
-    && !ready
-    && index === project.portraitProgress;
+type PortraitCardProps = {
+  character: CharacterDto;
+  index: number;
+  openLightbox: (image: LightboxImage, event: MouseEvent<HTMLElement>) => void;
+};
+
+export function PortraitCard({ character, index, openLightbox }: PortraitCardProps) {
+  const ready = character.portraitState === "succeeded" && Boolean(character.portraitUrl);
+  const generating = character.portraitState === "running";
 
   return (
     <article className="portrait-card">
       <button
         className={`portrait-art portrait-${index + 1} ${ready ? "ready" : "pending"}`}
-        onClick={(event) => ready && openLightbox(`${character.name} · Portrait plate ${index + 1}`, event)}
+        onClick={(event) => ready && character.portraitUrl && openLightbox({
+          url: character.portraitUrl,
+          label: `${character.name} · Portrait plate ${index + 1}`,
+          kind: "portrait",
+        }, event)}
         disabled={!ready}
         aria-label={ready
           ? `Open portrait of ${character.name}`
@@ -30,9 +34,7 @@ export function PortraitCard({ character, index, project, openLightbox }: Portra
         {ready ? (
           <img
             className="portrait-image"
-            src={index === 0
-              ? "/illustrations/mole-portrait.webp"
-              : "/illustrations/ratty-portrait.webp"}
+            src={character.portraitUrl ?? undefined}
             alt={`Illustrated portrait of ${character.name}`}
             width="220"
             height="330"
@@ -41,7 +43,7 @@ export function PortraitCard({ character, index, project, openLightbox }: Portra
           />
         ) : null}
         {generating ? (
-          <span className="press-loader"><i />Rendering plate {STEPS[index].roman}</span>
+          <span className="press-loader"><i />Rendering plate {index === 0 ? "I" : "II"}</span>
         ) : null}
         {!ready && !generating ? (
           <span className="portrait-awaiting" aria-hidden="true">

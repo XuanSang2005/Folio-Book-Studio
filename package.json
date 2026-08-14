@@ -4,20 +4,21 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.23.2"
   },
   "workspaces": [
     "frontend",
-    "backend"
+    "backend",
+    "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others --names frontend,backend --prefix-colors blue,magenta \"npm run dev -w frontend\" \"npm run dev -w backend\"",
-    "dev:frontend": "npm run dev -w frontend",
-    "dev:backend": "npm run dev -w backend",
-    "build": "npm run build -w frontend && npm run build -w backend",
-    "typecheck": "npm run typecheck -w frontend && npm run typecheck -w backend",
-    "lint": "npm run lint -w frontend && npm run lint -w backend",
-    "test": "npm test -w frontend && npm test -w backend",
+    "dev": "npm run build -w @gradion-folio/contracts && concurrently --kill-others --names frontend,backend --prefix-colors blue,magenta \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "dev:frontend": "npm run build -w @gradion-folio/contracts && npm run dev -w frontend",
+    "dev:backend": "npm run build -w @gradion-folio/contracts && npm run dev -w backend",
+    "build": "npm run build -w @gradion-folio/contracts && npm run build -w frontend && npm run build -w backend",
+    "typecheck": "npm run typecheck -w @gradion-folio/contracts && npm run typecheck -w frontend && npm run typecheck -w backend",
+    "lint": "npm run lint -w @gradion-folio/contracts && npm run lint -w frontend && npm run lint -w backend",
+    "test": "npm run build -w @gradion-folio/contracts && npm test -w frontend && npm test -w backend",
     "visual:before": "node docs/baseline/capture.mjs before",
     "visual:after": "node docs/baseline/capture.mjs after",
     "visual:compare": "node docs/baseline/compare.mjs"

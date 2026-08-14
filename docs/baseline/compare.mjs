@@ -91,7 +91,7 @@ const report = {
       (total, { alignedMeanAbsoluteColorDelta }) => total + alignedMeanAbsoluteColorDelta,
       0,
     ) / comparisons.length,
-  interpretation: "Raw pixel ratios include scroll-position changes introduced by route navigation. The aligned color metric searches only for a vertical offset; it does not resize, recolor, or otherwise transform either screenshot.",
+  interpretation: "Raw pixel ratios include authorized Phase 4 content changes (sample controls/copy removed, backend values rendered, pending fake generated images removed), dynamic browser font/image rasterization, and recorded scroll-position differences. The aligned color metric searches only for a vertical offset; it does not resize, recolor, or otherwise transform either screenshot.",
   comparisons,
 };
 

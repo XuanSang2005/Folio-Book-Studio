@@ -1,24 +1,32 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useDemoStore } from "../../lib/demo-store/DemoStore";
-import type { View } from "../../lib/demo-store/types";
+import { endSession } from "../../lib/api/client";
+import { sessionQueryOptions } from "../../lib/api/queries";
+import type { AppView } from "../../lib/presentation";
 
-export function Masthead({ view }: { view: Exclude<View, "identity"> }) {
+export function Masthead({ view }: { view: AppView }) {
   const navigate = useNavigate();
-  const { userName, signOut, setView } = useDemoStore();
+  const queryClient = useQueryClient();
+  const session = useQuery(sessionQueryOptions());
+  const signOut = useMutation({
+    mutationFn: endSession,
+    retry: false,
+    onSuccess: () => {
+      queryClient.clear();
+      void navigate({ to: "/login", replace: true });
+    },
+  });
 
   function goLibrary() {
-    setView("library");
     void navigate({ to: "/library" });
   }
 
   function goNewVolume() {
-    setView("new");
     void navigate({ to: "/volumes/new" });
   }
 
   function leaveStudio() {
-    signOut();
-    void navigate({ to: "/login", replace: true });
+    signOut.mutate();
   }
 
   return (
@@ -42,8 +50,13 @@ export function Masthead({ view }: { view: Exclude<View, "identity"> }) {
         </button>
       </nav>
       <div className="account-block">
-        <span className="account-name">{userName}</span>
-        <button className="text-link" onClick={leaveStudio}>Sign out</button>
+        <span className="account-name">{session.data?.user.name ?? ""}</span>
+        <button className="text-link" onClick={leaveStudio} disabled={signOut.isPending}>Sign out</button>
+        {signOut.isError ? (
+          <span className="account-signout-error" role="alert">
+            Sign out failed. Try again.
+          </span>
+        ) : null}
       </div>
     </header>
   );

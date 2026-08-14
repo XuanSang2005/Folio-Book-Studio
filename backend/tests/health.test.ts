@@ -1,20 +1,27 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { buildApp } from "../src/app.js";
+import { createTestHarness, type TestHarness } from "./helpers/harness.js";
 
-const applications: ReturnType<typeof buildApp>[] = [];
+const harnesses: TestHarness[] = [];
 
 afterEach(async () => {
-  await Promise.all(applications.splice(0).map((app) => app.close()));
+  await Promise.all(harnesses.splice(0).map((harness) => harness.cleanup()));
 });
 
 describe("GET /api/health", () => {
-  it("reports that the backend foundation is available", async () => {
-    const app = buildApp();
-    applications.push(app);
+  it("reports that the explicitly configured backend foundation is available", async () => {
+    const originalPort = process.env.PORT;
+    process.env.PORT = "ambient-invalid-port";
 
-    const response = await app.inject({ method: "GET", url: "/api/health" });
+    try {
+      const harness = await createTestHarness();
+      harnesses.push(harness);
+      const response = await harness.app.inject({ method: "GET", url: "/api/health" });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.json()).toEqual({ status: "ok" });
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({ status: "ok" });
+    } finally {
+      if (originalPort === undefined) delete process.env.PORT;
+      else process.env.PORT = originalPort;
+    }
   });
 });

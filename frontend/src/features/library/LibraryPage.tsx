@@ -1,40 +1,26 @@
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { AppChrome } from "../../components/layout/AppChrome";
-import { useDemoStore } from "../../lib/demo-store/DemoStore";
+import { projectsQueryOptions, sessionQueryOptions } from "../../lib/api/queries";
 import {
   STEPS,
   formatDate,
-  projectPlateSrc,
-  projectStatus,
-  wordCount,
-} from "../../lib/demo-store/data";
+  projectStatusLabel,
+} from "../../lib/presentation";
 
 export function LibraryPage() {
   const navigate = useNavigate();
-  const {
-    userName,
-    userEmail,
-    projects,
-    emptyLibrary,
-    setEmptyLibrary,
-    setView,
-    setActiveProjectId,
-  } = useDemoStore();
-  const visibleProjects = emptyLibrary
-    ? []
-    : projects.filter((project) => project.ownerEmail === userEmail.trim().toLowerCase());
-  const doneCount = visibleProjects.filter((project) => project.completedSteps === 5).length;
-  const activeCount = visibleProjects.filter(
-    (project) => project.completedSteps > 0 && project.completedSteps < 5,
-  ).length;
+  const session = useQuery(sessionQueryOptions());
+  const projectsQuery = useQuery(projectsQueryOptions());
+  const visibleProjects = projectsQuery.data?.projects ?? [];
+  const doneCount = visibleProjects.filter((project) => project.status === "done").length;
+  const activeCount = visibleProjects.filter((project) => project.status === "in_progress").length;
 
   function openNewVolume() {
-    setView("new");
     void navigate({ to: "/volumes/new" });
   }
 
   function openProject(id: string) {
-    setActiveProjectId(id);
     void navigate({ to: "/volumes/$volumeId", params: { volumeId: id } });
   }
 
@@ -47,7 +33,7 @@ export function LibraryPage() {
             <h1>Your volumes,<br /><em>in progress.</em></h1>
             <div className="library-intro-action">
               <p>
-                Good afternoon, {userName.split(" ")[0]}. Your manuscripts, visual direction,
+                Good afternoon, {session.data?.user.name.split(" ")[0]}. Your manuscripts, visual direction,
                 cast, and generated plates stay together here.
               </p>
               <button className="primary-button" onClick={openNewVolume}>
@@ -74,7 +60,26 @@ export function LibraryPage() {
           <div><span>PIPELINE</span><strong>V STAGES</strong></div>
         </section>
 
-        {visibleProjects.length ? (
+        {projectsQuery.isPending ? (
+          <section className="empty-library" aria-live="polite">
+            <div>
+              <p className="kicker">OPENING THE LEDGER</p>
+              <h2>Loading your volumes…</h2>
+              <p>The studio is restoring your private project library.</p>
+            </div>
+          </section>
+        ) : projectsQuery.isError ? (
+          <section className="empty-library" role="alert">
+            <div>
+              <p className="kicker">THE LEDGER COULD NOT OPEN</p>
+              <h2>Your library is temporarily unavailable.</h2>
+              <p>No project data was changed. Retry the request when you are ready.</p>
+              <button className="primary-button" onClick={() => void projectsQuery.refetch()}>
+                Retry library <span aria-hidden="true">↻</span>
+              </button>
+            </div>
+          </section>
+        ) : visibleProjects.length ? (
           <section className="project-ledger" aria-label="Your projects">
             <div className="ledger-head">
               <span>VOLUME / TITLE</span>
@@ -87,44 +92,44 @@ export function LibraryPage() {
                 <span className="project-title-block">
                   <span className="project-thumbnail" aria-hidden="true">
                     <img
-                      src={projectPlateSrc(project)}
+                      src="/illustrations/folio-triptych.webp"
                       alt=""
                       width="490"
                       height="976"
                       loading="lazy"
                       decoding="async"
                     />
-                    <span>{project.volume}</span>
+                    <span>VOL. {String(project.volumeNumber).padStart(2, "0")}</span>
                   </span>
                   <span>
                     <strong>{project.title}</strong>
                     <small>
-                      Created {formatDate(project.createdAt)} · {wordCount(project.bookText).toLocaleString()} words
+                      Created {formatDate(project.createdAt)} · {project.sourceWordCount.toLocaleString()} words
                     </small>
                   </span>
                 </span>
                 <span className="project-progress-block">
                   <span className="progress-fraction">
-                    {String(project.completedSteps).padStart(2, "0")} / 05
+                    {String(project.completedStepCount).padStart(2, "0")} / {String(project.totalStepCount).padStart(2, "0")}
                   </span>
                   <span
                     className="progress-rule"
-                    aria-label={`${project.completedSteps} of 5 stages complete`}
+                    aria-label={`${project.completedStepCount} of ${project.totalStepCount} stages complete`}
                   >
                     {STEPS.map((step, index) => (
-                      <i key={step.roman} className={index < project.completedSteps ? "filled" : ""} />
+                      <i key={step.roman} className={index < project.completedStepCount ? "filled" : ""} />
                     ))}
                   </span>
                   <small>
-                    {project.completedSteps === 5
+                    {project.completedStepCount === project.totalStepCount
                       ? "Final plate complete"
-                      : `${STEPS[project.completedSteps].label} ${project.completedSteps ? "is next" : "awaits"}`}
+                      : `${STEPS[project.completedStepCount]?.label ?? "Stage"} ${project.completedStepCount ? "is next" : "awaits"}`}
                   </small>
                 </span>
                 <span
-                  className={`status-stamp status-${projectStatus(project).toLowerCase().replace(" ", "-")}`}
+                  className={`status-stamp status-${projectStatusLabel(project.status).toLowerCase().replace(" ", "-")}`}
                 >
-                  {projectStatus(project)}
+                  {projectStatusLabel(project.status)}
                 </span>
                 <span className="row-arrow" aria-hidden="true">↗</span>
               </button>
@@ -156,12 +161,6 @@ export function LibraryPage() {
           </section>
         )}
 
-        <div className="specimen-switch">
-          <span>PROTOTYPE SPECIMEN</span>
-          <button className="text-link" onClick={() => setEmptyLibrary((current) => !current)}>
-            {emptyLibrary ? "Restore sample library" : "View empty state"}
-          </button>
-        </div>
       </main>
     </AppChrome>
   );

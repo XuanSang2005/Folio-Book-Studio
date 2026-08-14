@@ -1,3 +1,5 @@
+import type { SourceMode } from "@gradion-folio/contracts";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
   useCallback,
@@ -10,14 +12,33 @@ import {
   type MouseEvent,
 } from "react";
 import { AppChrome } from "../../components/layout/AppChrome";
-import { useDemoStore } from "../../lib/demo-store/DemoStore";
-import { STEPS, wordCount } from "../../lib/demo-store/data";
-import type { SourceMode } from "../../lib/demo-store/types";
+import {
+  ApiError,
+  createPasteProject,
+  createUploadProject,
+} from "../../lib/api/client";
+import { queryKeys } from "../../lib/api/query-keys";
+import { STEPS, wordCount } from "../../lib/presentation";
 import { SourceDialog } from "./SourceDialog";
+
+type Draft = {
+  title: string;
+  text: string;
+  fileName: string;
+  file: File | null;
+  sourceMode: SourceMode;
+};
 
 export function NewVolumePage() {
   const navigate = useNavigate();
-  const { draft, setDraft, createProject } = useDemoStore();
+  const queryClient = useQueryClient();
+  const [draft, setDraftState] = useState<Draft>({
+    title: "",
+    text: "",
+    fileName: "",
+    file: null,
+    sourceMode: "upload",
+  });
   const [newTitleError, setNewTitleError] = useState("");
   const [newManuscriptError, setNewManuscriptError] = useState("");
   const [newFileError, setNewFileError] = useState("");
@@ -36,6 +57,45 @@ export function NewVolumePage() {
   const sourceDropButtonRef = useRef<HTMLButtonElement | null>(null);
   const sourceReplaceRef = useRef<HTMLButtonElement | null>(null);
   const focusSourceReceiptAfterCloseRef = useRef(false);
+
+  function setDraft(value: Partial<Draft>) {
+    setDraftState((current) => ({ ...current, ...value }));
+  }
+
+  const createProject = useMutation({
+    mutationFn: (input:
+      | { title: string; sourceMode: "paste"; text: string }
+      | { title: string; sourceMode: "upload"; file: File }) => (
+      input.sourceMode === "paste"
+        ? createPasteProject(input)
+        : createUploadProject(input)
+    ),
+    retry: false,
+    onSuccess: (project) => {
+      queryClient.setQueryData(queryKeys.projectDetail(project.id), project);
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.projectList,
+        exact: true,
+        refetchType: "none",
+      });
+      void navigate({ to: "/volumes/$volumeId", params: { volumeId: project.id } });
+    },
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        const titleError = error.fieldErrors?.title?.[0];
+        const fileError = error.fieldErrors?.file?.[0];
+        const sourceError = error.fieldErrors?.source?.[0]
+          ?? error.fieldErrors?.text?.[0]
+          ?? error.fieldErrors?.sourceMode?.[0];
+        setNewTitleError(titleError ?? "");
+        setNewFileError(fileError ?? "");
+        setNewManuscriptError(sourceError ?? (!titleError && !fileError ? error.message : ""));
+        if (titleError) newTitleInputRef.current?.focus();
+        return;
+      }
+      setNewManuscriptError("The volume could not be created. Please try again.");
+    },
+  });
 
   const closeSource = useCallback(() => {
     setSourceModalOpen(false);
@@ -123,7 +183,7 @@ export function NewVolumePage() {
       setSourceModalError("That file is empty. Choose another manuscript.");
       return false;
     }
-    setDraft({ fileName: file.name, text });
+    setDraft({ fileName: file.name, text, file, sourceMode: "upload" });
     setSourceModalError("");
     setNewFileError("");
     setNewManuscriptError("");
@@ -163,7 +223,7 @@ export function NewVolumePage() {
       newTextInputRef.current?.focus();
       return;
     }
-    setDraft({ text, fileName: "" });
+    setDraft({ text, fileName: "", file: null, sourceMode: "paste" });
     setSourceModalError("");
     setNewFileError("");
     setNewManuscriptError("");
@@ -172,7 +232,7 @@ export function NewVolumePage() {
   }
 
   function removeSource() {
-    setDraft({ text: "", fileName: "" });
+    setDraft({ text: "", fileName: "", file: null });
     setSourceDraft("");
     setNewFileError("");
     setNewManuscriptError("");
@@ -194,11 +254,27 @@ export function NewVolumePage() {
       openSourceModal(null, "upload");
       return;
     }
-    const id = createProject();
     setNewTitleError("");
     setNewManuscriptError("");
     setNewFileError("");
-    void navigate({ to: "/volumes/$volumeId", params: { volumeId: id } });
+    if (draft.sourceMode === "upload") {
+      if (!draft.file) {
+        setNewFileError("Choose a plain .txt manuscript file.");
+        openSourceModal(null, "upload");
+        return;
+      }
+      createProject.mutate({
+        title: draft.title.trim(),
+        sourceMode: "upload",
+        file: draft.file,
+      });
+      return;
+    }
+    createProject.mutate({
+      title: draft.title.trim(),
+      sourceMode: "paste",
+      text: draft.text,
+    });
   }
 
   const sourceWords = wordCount(draft.text);
@@ -206,7 +282,12 @@ export function NewVolumePage() {
   const fileInvalid = Boolean(newFileError);
   const manuscriptInvalid = Boolean(newManuscriptError);
   const manuscriptReady = Boolean(draft.text.trim() && !newFileError);
-  const sourceReady = Boolean(draft.title.trim() && draft.text.trim() && !newFileError);
+  const sourceReady = Boolean(
+    draft.title.trim()
+    && draft.text.trim()
+    && !newFileError
+    && (draft.sourceMode === "paste" || draft.file),
+  );
 
   return (
     <AppChrome view="new">
@@ -338,7 +419,7 @@ export function NewVolumePage() {
                           type="button"
                           aria-haspopup="dialog"
                           aria-controls="source-dialog"
-                          onClick={(event) => openSourceModal(event, draft.fileName ? "upload" : "paste")}
+                        onClick={(event) => openSourceModal(event, draft.sourceMode)}
                         >
                           Replace
                         </button>
@@ -417,8 +498,9 @@ export function NewVolumePage() {
                   ? "primary-button commission-submit ready"
                   : "primary-button commission-submit"}
                 type="submit"
+                disabled={createProject.isPending}
               >
-                Create this volume <span aria-hidden="true">→</span>
+                {createProject.isPending ? "Creating volume…" : "Create this volume"} <span aria-hidden="true">→</span>
               </button>
             </div>
           </section>

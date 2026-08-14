@@ -79,15 +79,15 @@ The migrated application intentionally changes the address model to the required
 - No failed network requests.
 - All interaction and persistence assertions in `before/observations.json` passed.
 
-## Migrated verification
+## Phase 4 server-backed verification
 
-- `after/` repeats all 15 accepted screenshots at the identical desktop and mobile viewport sizes.
-- `after/observations.json` records 40 passing assertions with no console errors, uncaught page errors, or failed requests.
-- The migrated address model uses `/login`, `/library`, `/volumes/new`, and `/volumes/$volumeId`; direct navigation and back/forward history were exercised in addition to the baseline transitions.
-- The history check confirms that an in-memory New Volume draft survives browser back and forward navigation.
-- The same localStorage key, snapshot fields, sample data, stage results, and sign-out persistence remain in use.
-- The mobile Login, Library, and Studio checks again found no document-level horizontal overflow.
+- `after/` repeats all 15 accepted screenshots at the identical `1440 × 1000` and `390 × 844` viewport sizes.
+- `after/observations.json` records 41 passing interaction assertions with no application console errors, uncaught page errors, or failed requests. Expected browser diagnostics for unauthenticated `401` session restoration and intentional React Query/navigation aborts are classified separately.
+- The harness intercepts only root `/api/**` requests with a deterministic stateful fixture. It exercises the production API client, Zod parsing, Query cache, route guards, polling, and UI mapping without localStorage seed mode, an API key, or provider traffic.
+- Login creates a session; protected routes restore it; `/login` redirects an active session; sign-out deletes it. The harness confirms that no authoritative localStorage snapshot is written.
+- Library values and five-stage progress come from the list DTO. New Volume creates a real paste-contract project. Upload/paste dialogs, Escape close, focus restoration, and body/dialog behavior remain intact.
+- Studio exercises pending, running, complete, failed, stuck, explicit Recover-to-Retry, manuscript, authenticated portrait, and authenticated illustration states. Generated surfaces use `/api` artifact URLs; a pending final plate no longer shows a fixture image.
+- The recorded stage and recovery API traces fail the capture if either action refetches manuscript or performs a redundant successful detail reconciliation.
+- Mobile Login, Library, and Studio again have no document-level horizontal overflow.
 
-`comparison.json` contains the raw perceptual pixel result for every full viewport and a second alignment measurement that searches only for a vertical offset. It does not scale, recolor, crop, or otherwise transform either source image. This matters because the baseline used one state-driven `/` document and retained incidental Playwright click/scroll anchoring, while the required router restores scroll per URL. Key desktop views with the same scroll position differ by 2.90–7.35% raw perceptual pixels. Scroll-sensitive Studio frames align to the same composition with a low color delta; their larger raw ratios reflect different document offsets, which are recorded beside every migrated capture.
-
-Visual inspection confirmed the approved type treatment, palette, rules, spacing, cards, dialogs, imagery, responsive collapses, and animation states. The retained custom CSS remains the parity authority while Tailwind adoption proceeds section by section.
+`comparison.json` contains the raw perceptual pixel result for every full viewport and a second alignment measurement that searches only for a vertical offset. It does not scale, recolor, crop, or otherwise transform either image. Raw differences include the Phase 4 requirements to remove the sample-library control, prototype copy, fixture-generated pending imagery, and simulated footer wording; DTO content and historical click/scroll positions also change pixels. Unchanged desktop compositions such as New Volume, Library, failed, and stuck remain within roughly 3.5–5.6% raw difference. Visual inspection confirms the approved type treatment, palette, rules, spacing, cards, dialogs, imagery, responsive collapses, and animation states. The retained custom CSS remains the parity authority.

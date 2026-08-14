@@ -1,6 +1,7 @@
 {
   "phase": "after",
   "baseUrl": "http://localhost:3000",
+  "fixture": "deterministic intercepted same-origin /api responses",
   "desktopViewport": {
     "width": 1440,
     "height": 1000
@@ -10,8 +11,409 @@
     "height": 844
   },
   "consoleErrors": [],
+  "expectedAuthDiagnostics": [
+    {
+      "page": "desktop",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    },
+    {
+      "page": "desktop",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    },
+    {
+      "page": "desktop",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    },
+    {
+      "page": "mobile",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    },
+    {
+      "page": "mobile",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    }
+  ],
   "pageErrors": [],
   "failedRequests": [],
+  "expectedNavigationAborts": [
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/baseline-pipeline",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/baseline-pipeline/manuscript",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/riverbank",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/riverbank",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/riverbank",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/riverbank",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "desktop",
+      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "mobile",
+      "url": "http://localhost:3000/api/projects",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "mobile",
+      "url": "http://localhost:3000/api/projects/riverbank",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "page": "mobile",
+      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "externalRequests": [],
+  "apiRequests": [
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "POST",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline/manuscript"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/1/run"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/2/run"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/3/run"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline/characters/character-mole/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline/characters/character-ratty/portrait"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/4/run"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/5/run"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline/chapters/chapter-riverbank/illustration"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-mole/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-ratty/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-mole/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-ratty/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-mole/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-ratty/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-mole/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-ratty/portrait"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/riverbank/steps/5/recover"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session"
+    },
+    {
+      "method": "POST",
+      "path": "/api/session"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/manuscript"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-mole/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/riverbank/characters/character-ratty/portrait"
+    }
+  ],
   "captures": [
     {
       "name": "login-desktop-1440x1000.png",
@@ -27,23 +429,23 @@
     },
     {
       "name": "upload-dialog-desktop-1440x1000.png",
-      "scrollY": 302
+      "scrollY": 758
     },
     {
       "name": "paste-dialog-desktop-1440x1000.png",
-      "scrollY": 830
+      "scrollY": 758
     },
     {
       "name": "studio-pending-desktop-1440x1000.png",
-      "scrollY": 104
+      "scrollY": 585
     },
     {
       "name": "studio-running-desktop-1440x1000.png",
-      "scrollY": 471
+      "scrollY": 540
     },
     {
       "name": "studio-completed-desktop-1440x1000.png",
-      "scrollY": 509
+      "scrollY": 0
     },
     {
       "name": "studio-desktop-1440x1000.png",
@@ -71,12 +473,22 @@
     },
     {
       "name": "studio-mobile-390x844.png",
-      "scrollY": 261
+      "scrollY": 605
     }
   ],
   "assertions": [
     {
-      "name": "login renders",
+      "name": "unauthenticated root redirects to Login",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Login uses its direct route",
+      "passed": true,
+      "detail": "http://localhost:3000/login"
+    },
+    {
+      "name": "no authoritative localStorage snapshot",
       "passed": true,
       "detail": ""
     },
@@ -91,57 +503,32 @@
       "detail": ""
     },
     {
-      "name": "sample library opens",
+      "name": "session login opens Library",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "sample identity stored",
-      "passed": true,
-      "detail": ""
-    },
-    {
-      "name": "sample projects stored",
-      "passed": true,
-      "detail": ""
-    },
-    {
-      "name": "library view stored",
-      "passed": true,
-      "detail": ""
-    },
-    {
-      "name": "library survives reload",
-      "passed": true,
-      "detail": ""
-    },
-    {
-      "name": "library has its direct route",
+      "name": "Library uses its direct route",
       "passed": true,
       "detail": "http://localhost:3000/library"
     },
     {
-      "name": "new volume opens",
+      "name": "desktop Library has no document overflow",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "route navigation pushes history",
-      "passed": true,
-      "detail": "http://localhost:3000/volumes/new"
-    },
-    {
-      "name": "browser back returns to library",
+      "name": "cookie session restores Library on reload",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "browser forward returns to New Volume",
+      "name": "active session redirects away from Login",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "browser history preserves the in-memory commission draft",
+      "name": "New Volume opens",
       "passed": true,
       "detail": ""
     },
@@ -151,37 +538,47 @@
       "detail": ""
     },
     {
-      "name": "invalid upload is rejected",
+      "name": "Escape closes source dialog and restores focus",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "valid upload creates receipt",
+      "name": "created project enters persisted Studio",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "new project enters studio",
+      "name": "pending run maps to named running state",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "running state renders",
+      "name": "stage execution does not refetch manuscript",
+      "passed": true,
+      "detail": "[{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/1/run\"},{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/2/run\"},{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/3/run\"},{\"method\":\"GET\",\"path\":\"/api/projects/baseline-pipeline/characters/character-mole/portrait\"},{\"method\":\"GET\",\"path\":\"/api/projects/baseline-pipeline/characters/character-ratty/portrait\"},{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/4/run\"},{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/5/run\"},{\"method\":\"GET\",\"path\":\"/api/projects/baseline-pipeline/chapters/chapter-riverbank/illustration\"}]"
+    },
+    {
+      "name": "successful stage execution does not duplicate detail reconciliation",
+      "passed": true,
+      "detail": "[{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/1/run\"},{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/2/run\"},{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/3/run\"},{\"method\":\"GET\",\"path\":\"/api/projects/baseline-pipeline/characters/character-mole/portrait\"},{\"method\":\"GET\",\"path\":\"/api/projects/baseline-pipeline/characters/character-ratty/portrait\"},{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/4/run\"},{\"method\":\"POST\",\"path\":\"/api/projects/baseline-pipeline/steps/5/run\"},{\"method\":\"GET\",\"path\":\"/api/projects/baseline-pipeline/chapters/chapter-riverbank/illustration\"}]"
+    },
+    {
+      "name": "generated illustration uses authenticated API URL",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "completed pipeline survives reload",
+      "name": "persisted Stage V Studio opens",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "seed studio opens",
+      "name": "manuscript dialog opens from API text",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "manuscript dialog opens",
+      "name": "Escape closes manuscript and restores focus",
       "passed": true,
       "detail": ""
     },
@@ -201,62 +598,67 @@
       "detail": ""
     },
     {
-      "name": "failed state renders",
+      "name": "failed state maps to Retry",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "failed stage retries",
+      "name": "stuck state maps to Recover",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "stuck state renders",
+      "name": "Recover stops at failed retryable state",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "stuck stage recovers",
+      "name": "Recover does not refetch manuscript",
+      "passed": true,
+      "detail": "[{\"method\":\"POST\",\"path\":\"/api/projects/riverbank/steps/5/recover\"}]"
+    },
+    {
+      "name": "successful Recover does not duplicate detail reconciliation",
+      "passed": true,
+      "detail": "[{\"method\":\"POST\",\"path\":\"/api/projects/riverbank/steps/5/recover\"}]"
+    },
+    {
+      "name": "sign out returns to Login",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "sign out returns to login",
+      "name": "sign out clears intercepted session",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "signed-out view survives reload",
+      "name": "mobile Login renders",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "mobile login renders",
+      "name": "mobile Login has no document overflow",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "mobile login has no document overflow",
+      "name": "mobile Library opens through session API",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "mobile library opens",
+      "name": "mobile Library has no document overflow",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "mobile library has no document overflow",
+      "name": "mobile Studio opens",
       "passed": true,
       "detail": ""
     },
     {
-      "name": "mobile studio opens",
-      "passed": true,
-      "detail": ""
-    },
-    {
-      "name": "mobile studio has no document overflow",
+      "name": "mobile Studio has no document overflow",
       "passed": true,
       "detail": ""
     },
@@ -274,6 +676,51 @@
       "name": "no failed requests",
       "passed": true,
       "detail": "[]"
+    },
+    {
+      "name": "no external provider requests",
+      "passed": true,
+      "detail": "[]"
+    }
+  ],
+  "stageExecutionApiTrace": [
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/1/run"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/2/run"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/3/run"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline/characters/character-mole/portrait"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline/characters/character-ratty/portrait"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/4/run"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/baseline-pipeline/steps/5/run"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/baseline-pipeline/chapters/chapter-riverbank/illustration"
+    }
+  ],
+  "recoveryApiTrace": [
+    {
+      "method": "POST",
+      "path": "/api/projects/riverbank/steps/5/recover"
     }
   ]
 }

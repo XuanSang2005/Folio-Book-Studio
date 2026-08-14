@@ -1,10 +1,10 @@
+import type { SourceMode } from "@gradion-folio/contracts";
 import type {
   ChangeEvent,
   DragEvent,
   RefObject,
 } from "react";
-import { wordCount } from "../../lib/demo-store/data";
-import type { SourceMode } from "../../lib/demo-store/types";
+import { wordCount } from "../../lib/presentation";
 
 type SourceDialogProps = {
   open: boolean;

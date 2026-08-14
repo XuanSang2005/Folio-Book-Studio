@@ -1,7 +1,7 @@
-import { Outlet, createRootRoute } from "@tanstack/react-router";
-import { DemoStoreProvider } from "../lib/demo-store/DemoStore";
+import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import type { RouterContext } from "../lib/api/route-guards";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
   notFoundComponent: () => (
     <main className="grid min-h-screen place-items-center bg-paper px-6 text-center text-ink">
@@ -14,9 +14,5 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  return (
-    <DemoStoreProvider>
-      <Outlet />
-    </DemoStoreProvider>
-  );
+  return <Outlet />;
 }

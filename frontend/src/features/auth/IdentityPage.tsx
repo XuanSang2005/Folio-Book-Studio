@@ -1,24 +1,40 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useDemoStore } from "../../lib/demo-store/DemoStore";
-import { STEPS } from "../../lib/demo-store/data";
+import { useRef, useState, type FormEvent } from "react";
+import { ApiError, createSession } from "../../lib/api/client";
+import { queryKeys } from "../../lib/api/query-keys";
+import { STEPS } from "../../lib/presentation";
 import { validateIdentity } from "../../lib/validation/identity";
 
 export function IdentityPage() {
   const navigate = useNavigate();
-  const {
-    userName,
-    userEmail,
-    setView,
-    setIdentityDraft,
-    setIdentity,
-    enterSampleIdentity,
-  } = useDemoStore();
+  const queryClient = useQueryClient();
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [identityError, setIdentityError] = useState("");
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => setView("identity"), [setView]);
+  const login = useMutation({
+    mutationFn: createSession,
+    retry: false,
+    onSuccess: (session) => {
+      queryClient.clear();
+      queryClient.setQueryData(queryKeys.session, session);
+      void navigate({ to: "/library" });
+    },
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        const nameError = error.fieldErrors?.name?.[0];
+        const emailError = error.fieldErrors?.email?.[0];
+        setIdentityError(nameError ?? emailError ?? error.message);
+        if (nameError) nameInputRef.current?.focus();
+        else if (emailError) emailInputRef.current?.focus();
+        return;
+      }
+      setIdentityError("The studio could not start your session. Please try again.");
+    },
+  });
 
   const nameInvalid = Boolean(identityError && !userName.trim());
   const emailInvalid = Boolean(identityError && !/^\S+@\S+\.\S+$/.test(userEmail.trim()));
@@ -37,14 +53,7 @@ export function IdentityPage() {
       return;
     }
     setIdentityError("");
-    setIdentity(userName, userEmail);
-    void navigate({ to: "/library" });
-  }
-
-  function openSampleLibrary() {
-    setIdentityError("");
-    enterSampleIdentity();
-    void navigate({ to: "/library" });
+    login.mutate({ name: userName.trim(), email: userEmail.trim() });
   }
 
   return (
@@ -77,7 +86,7 @@ export function IdentityPage() {
 
           <div className="login-admission-seal" aria-hidden="true">
             <span>STUDIO</span>
-            <strong>№ 05</strong>
+            <strong>№ {String(STEPS.length).padStart(2, "0")}</strong>
             <em>est.</em>
             <span>MMXXVI</span>
           </div>
@@ -102,7 +111,7 @@ export function IdentityPage() {
                   name="name"
                   value={userName}
                   onChange={(event) => {
-                    setIdentityDraft({ userName: event.target.value });
+                    setUserName(event.target.value);
                     setIdentityError("");
                   }}
                   autoComplete="name"
@@ -120,7 +129,7 @@ export function IdentityPage() {
                   name="email"
                   value={userEmail}
                   onChange={(event) => {
-                    setIdentityDraft({ userEmail: event.target.value });
+                    setUserEmail(event.target.value);
                     setIdentityError("");
                   }}
                   autoComplete="email"
@@ -134,22 +143,15 @@ export function IdentityPage() {
               {identityError ? (
                 <p className="inline-error" id="identity-error" role="alert">{identityError}</p>
               ) : null}
-              <button className="primary-button login-submit" type="submit">
-                Enter <span aria-hidden="true">→</span>
+              <button className="primary-button login-submit" type="submit" disabled={login.isPending}>
+                {login.isPending ? "Entering…" : "Enter"} <span aria-hidden="true">→</span>
               </button>
             </form>
-
-            <div className="login-sample">
-              <p>Reviewing the prototype?</p>
-              <button type="button" onClick={openSampleLibrary}>
-                Use the sample library <span aria-hidden="true">↗</span>
-              </button>
-            </div>
           </div>
 
           <div className="login-entry-footer" id="login-identity-note">
-            <span>PROTOTYPE IDENTITY · NO PASSWORD</span>
-            <p>New email addresses create a private, empty library. Returning addresses resume saved work.</p>
+            <span>LOCAL STUDIO IDENTITY · NO PASSWORD</span>
+            <p>Your session is stored securely on this device. Returning email addresses resume their own saved work.</p>
           </div>
         </section>
       </main>

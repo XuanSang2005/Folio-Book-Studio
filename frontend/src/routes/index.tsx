@@ -1,21 +1,15 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { readSnapshot } from "../lib/demo-store/storage";
+import { ApiError } from "../lib/api/client";
+import { sessionQueryOptions } from "../lib/api/queries";
 
 export const Route = createFileRoute("/")({
-  beforeLoad: () => {
-    const snapshot = readSnapshot();
-    if (snapshot.view === "identity" || !snapshot.userEmail) {
+  beforeLoad: async ({ context }) => {
+    try {
+      await context.queryClient.ensureQueryData(sessionQueryOptions());
+      throw redirect({ to: "/library" });
+    } catch (error) {
+      if (!(error instanceof ApiError) || error.status !== 401) throw error;
       throw redirect({ to: "/login" });
     }
-    if (snapshot.view === "new") {
-      throw redirect({ to: "/volumes/new" });
-    }
-    if (snapshot.view === "studio") {
-      throw redirect({
-        to: "/volumes/$volumeId",
-        params: { volumeId: snapshot.activeProjectId },
-      });
-    }
-    throw redirect({ to: "/library" });
   },
 });
