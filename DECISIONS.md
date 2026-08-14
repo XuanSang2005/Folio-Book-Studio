@@ -1,56 +1,31 @@
 # Engineering decisions
 
-## Phase 4 — 2026-08-14
+These decisions summarize the strongest implementation choices. They are based on the recorded task prompts, migration history, tests, and code; they are not reconstructed conversations or quotations.
 
-### Server cache and route access have separate responsibilities
+## 1. Replace vinext instead of preserving a Next-shaped runtime
 
-TanStack Query owns session, project-list, project-detail, and manuscript request state with centralized keys and no automatic mutation retry. TanStack Router loaders call the same typed session query before protected components mount. This prevents a protected-page flash on direct navigation while keeping request deduplication, invalidation, polling, and abort behavior in one cache boundary.
+Codex initially treated the repository’s Next-shaped files and unavailable in-app browser registry as possible constraints on the migration. I corrected that interpretation: the running application was vinext, the browser limitation was tooling-only, and the target was React/Vite with Fastify—not vinext and not standard Next.js. We captured the accepted UI through local Playwright, moved it to the required workspace, and kept the large custom stylesheet as the visual authority while using Tailwind selectively. This made the runtime understandable and matched the brief without redesigning the product. The accepted cost is that a parity-sensitive stylesheet remains large and future Tailwind conversion must be incremental and visually verified.
 
-Sign-out calls the backend first, clears all Query caches, and only then navigates to Login. Successful login also starts from a cleared cache before installing the new session. This prevents one email identity's Library or Studio data from appearing under a later identity.
+## 2. Make SQLite claims—not browser state—the duplicate-execution guarantee
 
-### New Volume retains source intent until the backend accepts it
+The early migrated UI and AI-generated demo store could prevent a second click only inside one browser state. I rejected treating that as a production concurrency guarantee because refreshes, tabs, and two server instances could still race. The final design uses a short atomic SQLite claim, durable attempts, a live lease, heartbeat extension, and active-attempt fencing; provider work occurs after the transaction. This makes the backend authoritative and proves that a live duplicate does not start another provider sequence. The cost is a deliberately single-host design: a killed foreground run waits for lease expiry and explicit Recover, and true distributed exactly-once execution is not claimed.
 
-The create form remains local UI state, but upload mode retains the original `File` object and submits it as one multipart `file` part. Paste mode sends the distinct JSON contract. Reading an upload for the existing receipt preview does not convert it into pasted text, and backend field errors map back into the approved title/source error surfaces.
+## 3. Reject automatic SDK retries and model fallback
 
-### Persisted steps drive Studio presentation
+Codex’s initial integration path allowed using the Google SDK, but it could not point to one demonstrable option that disabled every automatic retry across both Files and Interactions requests. I required user-triggered retries only because a hidden retry can spend quota twice, and I also rejected automatic model fallback because it changes cost, quality, capability, and provenance without consent. The implemented gateway therefore uses native `fetch`, one attempt per request, explicit timeouts, environment-selected models, and transport tests proving one simulated 429 produces one outgoing interaction request. The cost is maintaining request/response parsing locally and updating those compatibility tests when the provider contract changes.
 
-Studio does not reconstruct a mutable client project model. The current stage is the first server step that has not succeeded; failed, stuck, running, portrait, chapter, and illustration states come from the DTO. A run request is never retried automatically. Project detail polls at 1.5 seconds only while a run mutation is pending or a persisted step is visibly running; Recover returns to an explicit retryable state and never triggers Run.
+## 4. Split provider work into durable, owned checkpoints
 
-### Visual regression uses the same API boundary without provider traffic
+An earlier AI approach could have represented Stage I as one coarse “Gemini context” operation. I required source upload, book-context creation, style, characters, image context, each portrait, chapter, and final illustration to have separate provider-operation and persistence boundaries. The source URI and root interaction belong to the project; later terminal interactions belong to their step or item. This allows a retry to reuse completed work, proves that the manuscript upload happens once in the fake full run, and avoids silently rebuilding expired context. The cost is more state and reconciliation code, plus an explicit `CONTEXT_EXPIRED` failure when required remote context has expired.
 
-The Playwright harness intercepts same-origin `/api` routes with deterministic stateful fixtures, including session restoration, progressive stages, authenticated image paths, failures, and recovery. Production sample mode and localStorage are not reintroduced for screenshots, and the harness makes no Gemini or external provider request.
+## 5. Use one explicit Stage V portrait-reference strategy
 
-## Phase 3 — 2026-08-14
+Codex considered combining a continuing image chain with explicit portrait references for the final illustration. I rejected the mixed approach because its context ownership and billing behavior were harder to reason about and the notebook evidence did not establish it as necessary. Stage V now starts a fresh image interaction with the selected style, the chapter brief, and only the locally stored portraits referenced by that chapter; it does not resend the manuscript or inherit an old image interaction. Portraits are persisted individually so a successful first portrait survives a later failure. The cost is that visual continuity depends on explicit local portrait references rather than an indefinitely reusable remote image conversation.
 
-### Native fetch for Gemini transport
+## 6. Keep the assessed release local and private
 
-The real gateway uses a small native `fetch` transport rather than `@google/genai`. Current official documentation describes retry configuration in SDK areas but does not demonstrate one option that disables every automatic retry for both Files and Interactions. Native fetch makes the required behavior explicit: one request attempt, one timeout, no retry loop, and no fallback. The Files API still requires its documented two-request resumable protocol (start, then upload/finalize); neither request is retried.
+AI planning surfaced cloud deployment, queues, Redis, object storage, Docker, and broader authentication as possible production patterns. I kept them out because the brief evaluates a local single-host application and those additions would increase operational and privacy surface without improving the required workflow. Fastify serves the SPA and API from one loopback origin; SQLite and a private local filesystem remain the durable stores; artifacts are streamed only through owner-checked APIs. The cost is an honest scale boundary: horizontal operation would require shared database, object storage, and job coordination, and no public demo is provided.
 
-The implementation follows the current official Files upload and Interactions shapes, restates request-scoped response configuration on every call, uses `service_tier: "standard"`, and extracts output from model-output content. Official references used for the implementation:
+## If I had one more day
 
-- https://ai.google.dev/api/files
-- https://ai.google.dev/api/interactions
-- https://ai.google.dev/gemini-api/docs/interactions
-- https://ai.google.dev/gemini-api/docs/structured-output
-- https://ai.google.dev/gemini-api/docs/image-generation
-- https://github.com/google-gemini/cookbook/blob/main/examples/Book_illustration.ipynb
-
-### Deliberate model selection and no fallback
-
-The product defaults remain `gemini-3.6-flash` for text and the quality-focused `gemini-3.1-flash-image` for images. The notebook's `gemini-3.1-flash-lite-image` remains an explicit `GEMINI_IMAGE_MODEL` override. Automatic fallback is rejected because it would change image quality, capability, provenance, and cost without user intent. Every provider operation records the configured model before the call and the provider-reported model after success.
-
-### Stage V uses explicit local portrait references
-
-Final illustration generation starts a fresh image interaction and supplies only the local portraits named by the persisted chapter, each paired with its character ID and name. It sends the chapter prompt and selected style, not the manuscript or an old image interaction. This is the single Stage V approach; no transition interaction or mixed chaining path is used.
-
-### Provider identifiers have one domain owner
-
-The root book interaction belongs to the project; generated style and character/chapter terminal interactions belong to their corresponding pipeline steps; portrait context belongs to the project; portrait interactions belong to characters; and the illustration interaction belongs to the chapter. Provider-operation rows record request IDs and symbolic context keys instead of duplicating authoritative interaction IDs.
-
-### Local artifacts are private associations
-
-Artifacts use server-owned, attempt-specific names under `DATA_DIR`, atomic rename, byte/MIME/magic validation, and database metadata including SHA-256. A file becomes visible only through a fenced succeeded character/chapter association and an authenticated owner-scoped API. Crash orphans may remain on disk for later maintenance but cannot be requested through the API.
-
-### Paid image UAT is deferred
-
-The candidate verified API-key access, Files upload, root interaction, style generation, and structured character extraction in the notebook. The candidate's free-tier image quota is `0`, and image generation returned 429. That record remains unchanged in `docs/ai/notebook-observations.md`. No real provider call was made in Phase 3 implementation or verification.
+I would first fund and run one bounded, public-domain Gemini image UAT through all five stages. I would record model IDs, provider-operation counts, per-stage duration, image counts, source-upload count, context-expiry behavior, and any real response-shape differences, then update the transport fixtures and documentation only where that run produced evidence. That is more valuable than adding polish because the current unknown is paid image behavior: the notebook’s first image request stopped at HTTP 429 with zero quota, while all current end-to-end success evidence is deterministic and keyless.

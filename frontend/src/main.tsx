@@ -9,7 +9,10 @@ import { routeTree } from "./routeTree.gen";
 import { createAppQueryClient } from "./lib/api/query-client";
 import "./styles/globals.css";
 
-export const queryClient = createAppQueryClient();
+let navigateAfterSessionExpiry: () => void | Promise<void> = () => undefined;
+export const queryClient = createAppQueryClient({
+  onSessionExpired: () => navigateAfterSessionExpiry(),
+});
 
 export const router = createRouter({
   routeTree,
@@ -17,6 +20,11 @@ export const router = createRouter({
   defaultPreload: "intent",
   scrollRestoration: true,
 });
+
+navigateAfterSessionExpiry = () => {
+  if (router.state.location.pathname === "/login") return;
+  return router.navigate({ to: "/login", replace: true });
+};
 
 declare module "@tanstack/react-router" {
   interface Register {

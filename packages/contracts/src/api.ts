@@ -39,6 +39,7 @@ export const ReadinessResponseSchema = z.object({
   status: z.enum(["ready", "not_ready"]),
   checks: z.object({
     database: z.enum(["ok", "error"]),
+    migrations: z.enum(["ok", "error"]),
     dataDirectory: z.enum(["ok", "error"]),
   }),
   geminiConfigured: z.boolean(),

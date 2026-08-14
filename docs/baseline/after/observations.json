@@ -1,6 +1,6 @@
 {
   "phase": "after",
-  "baseUrl": "http://localhost:3000",
+  "baseUrl": "http://127.0.0.1:63001",
   "fixture": "deterministic intercepted same-origin /api responses",
   "desktopViewport": {
     "width": 1440,
@@ -35,98 +35,7 @@
   ],
   "pageErrors": [],
   "failedRequests": [],
-  "expectedNavigationAborts": [
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/baseline-pipeline",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/baseline-pipeline/manuscript",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/riverbank",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/riverbank",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/riverbank",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/riverbank",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "desktop",
-      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "mobile",
-      "url": "http://localhost:3000/api/projects",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "mobile",
-      "url": "http://localhost:3000/api/projects/riverbank",
-      "error": "net::ERR_ABORTED"
-    },
-    {
-      "page": "mobile",
-      "url": "http://localhost:3000/api/projects/riverbank/manuscript",
-      "error": "net::ERR_ABORTED"
-    }
-  ],
+  "expectedNavigationAborts": [],
   "externalRequests": [],
   "apiRequests": [
     {
@@ -147,10 +56,6 @@
     },
     {
       "method": "GET",
-      "path": "/api/projects"
-    },
-    {
-      "method": "GET",
       "path": "/api/session"
     },
     {
@@ -159,15 +64,7 @@
     },
     {
       "method": "GET",
-      "path": "/api/projects"
-    },
-    {
-      "method": "GET",
       "path": "/api/session"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects"
     },
     {
       "method": "GET",
@@ -176,14 +73,6 @@
     {
       "method": "POST",
       "path": "/api/projects"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/baseline-pipeline"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/baseline-pipeline/manuscript"
     },
     {
       "method": "GET",
@@ -231,18 +120,6 @@
     },
     {
       "method": "GET",
-      "path": "/api/projects"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/riverbank"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/riverbank/manuscript"
-    },
-    {
-      "method": "GET",
       "path": "/api/projects/riverbank"
     },
     {
@@ -267,23 +144,11 @@
     },
     {
       "method": "GET",
-      "path": "/api/projects"
-    },
-    {
-      "method": "GET",
       "path": "/api/session"
     },
     {
       "method": "GET",
       "path": "/api/session"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/riverbank"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/riverbank/manuscript"
     },
     {
       "method": "GET",
@@ -315,14 +180,6 @@
     },
     {
       "method": "GET",
-      "path": "/api/projects/riverbank"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/riverbank/manuscript"
-    },
-    {
-      "method": "GET",
       "path": "/api/projects/riverbank/characters/character-mole/portrait"
     },
     {
@@ -332,14 +189,6 @@
     {
       "method": "GET",
       "path": "/api/session"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/riverbank"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/riverbank/manuscript"
     },
     {
       "method": "GET",
@@ -387,18 +236,6 @@
     },
     {
       "method": "GET",
-      "path": "/api/projects"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/riverbank"
-    },
-    {
-      "method": "GET",
-      "path": "/api/projects/riverbank/manuscript"
-    },
-    {
-      "method": "GET",
       "path": "/api/projects/riverbank"
     },
     {
@@ -437,7 +274,7 @@
     },
     {
       "name": "studio-pending-desktop-1440x1000.png",
-      "scrollY": 585
+      "scrollY": 584
     },
     {
       "name": "studio-running-desktop-1440x1000.png",
@@ -473,7 +310,7 @@
     },
     {
       "name": "studio-mobile-390x844.png",
-      "scrollY": 605
+      "scrollY": 606
     }
   ],
   "assertions": [
@@ -485,7 +322,7 @@
     {
       "name": "Login uses its direct route",
       "passed": true,
-      "detail": "http://localhost:3000/login"
+      "detail": "http://127.0.0.1:63001/login"
     },
     {
       "name": "no authoritative localStorage snapshot",
@@ -510,7 +347,7 @@
     {
       "name": "Library uses its direct route",
       "passed": true,
-      "detail": "http://localhost:3000/library"
+      "detail": "http://127.0.0.1:63001/library"
     },
     {
       "name": "desktop Library has no document overflow",

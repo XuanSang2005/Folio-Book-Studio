@@ -1,10 +1,8 @@
-import { createRequire } from "node:module";
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import pixelmatch from "pixelmatch";
+import { PNG } from "pngjs";
 
-const require = createRequire(import.meta.url);
-const { PNG } = require("playwright-core/lib/utilsBundle");
-const { compare } = require("playwright-core/lib/server/utils/image_tools/compare");
 const beforeDirectory = resolve("docs/baseline/before");
 const afterDirectory = resolve("docs/baseline/after");
 const imageNames = (await readdir(beforeDirectory))
@@ -59,13 +57,13 @@ for (const name of imageNames) {
   if (before.width !== after.width || before.height !== after.height) {
     throw new Error(`Image dimensions differ for ${name}`);
   }
-  const differentPixels = compare(
-    after.data,
+  const differentPixels = pixelmatch(
     before.data,
+    after.data,
     undefined,
     before.width,
     before.height,
-    { maxColorDeltaE94: 1 },
+    { includeAA: true, threshold: 0.01 },
   );
   const totalPixels = before.width * before.height;
   comparisons.push({
@@ -78,7 +76,7 @@ for (const name of imageNames) {
 }
 
 const report = {
-  metric: "Playwright perceptual pixel comparison",
+  metric: "Pixelmatch perceptual pixel comparison",
   generatedAt: new Date().toISOString(),
   maximumDifferentPixelRatio: Math.max(
     ...comparisons.map(({ differentPixelRatio }) => differentPixelRatio),
@@ -91,7 +89,7 @@ const report = {
       (total, { alignedMeanAbsoluteColorDelta }) => total + alignedMeanAbsoluteColorDelta,
       0,
     ) / comparisons.length,
-  interpretation: "Raw pixel ratios include authorized Phase 4 content changes (sample controls/copy removed, backend values rendered, pending fake generated images removed), dynamic browser font/image rasterization, and recorded scroll-position differences. The aligned color metric searches only for a vertical offset; it does not resize, recolor, or otherwise transform either screenshot.",
+  interpretation: "Raw pixel ratios include authorized Phase 4 content changes (sample controls/copy removed, backend values rendered, pending fake generated images removed), dynamic browser font/image rasterization, and recorded scroll-position differences. The public pixelmatch library replaces a removed private Playwright API. The aligned color metric searches only for a vertical offset; it does not resize, recolor, or otherwise transform either screenshot.",
   comparisons,
 };
 

@@ -1,30 +1,14 @@
-# Testing
+# Testing and verification
 
-## Phase 3 local verification
+Final keyless verification date: **2026-08-14**. Environment: macOS 26.5.1 arm64, Node.js 26.5.0, npm 11.17.0. Every automated command set `GEMINI_API_KEY=`. No test made a billed or external provider request; npm registry access was used only for installation and audits.
 
-The default suite uses temporary SQLite databases, temporary private data directories, deterministic IDs/time, and `FakeGeminiGateway`. It requires no `GEMINI_API_KEY` and makes no external network request. Transport tests use a temporary loopback-only HTTP server and never contact Google.
+## Strategy
 
-Focused results recorded during implementation:
+The default suite tests domain behavior against temporary SQLite databases and private data directories. IDs, time, heartbeat behavior, and Gemini outputs are deterministic. Fastify integration tests use `app.inject` except where a controlled loopback server is specifically required for provider-transport or built-runtime behavior. Frontend tests use React Testing Library with typed API fixtures and fake timers where needed. The visual harness runs local headless Chromium and intercepts same-origin `/api` calls with deterministic fixtures.
 
-```text
-npm run test --workspace backend -- tests/phase3-pipeline.test.ts
-Test Files  1 passed (1)
-Tests       2 passed (2)
+Backend coverage includes migrations and constraints; email continuity and owner isolation; paste/upload validation and atomic source storage; project numbering; five-step ordering; live duplicate claims; leases, Recover, explicit Retry, heartbeat, and stale-attempt fencing; restart persistence; partial portrait checkpoints; artifact byte/MIME/path validation; provider-operation provenance; readiness; same-origin protection; log redaction; and graceful shutdown.
 
-npm run test --workspace backend -- tests/gemini-transport.test.ts
-Test Files  1 passed (1)
-Tests       4 passed (4)
-
-npm run test --workspace backend -- tests/artifacts.test.ts
-Test Files  1 passed (1)
-Tests       3 passed (3)
-
-npm run test --workspace backend -- tests/phase3-resume-validation.test.ts
-Test Files  1 passed (1)
-Tests       14 passed (14)
-```
-
-The complete fake run makes exactly nine gateway calls for the default two-adult project:
+The fake five-stage integration performs exactly nine gateway operations for a two-adult project:
 
 ```text
 uploadSource ×1
@@ -37,29 +21,89 @@ extractChapter ×1
 generateIllustration ×1
 ```
 
-It persists one style, two validated adults, two portraits, one chapter, one illustration, nine succeeded provider-operation rows, and a Done project. All three artifacts remain readable through authenticated URLs after rebuilding the app against the same temporary database and data root.
+It persists one style, two validated adults, two independent portraits, one chapter, one final illustration, and a Done project. Resume tests prove the source is not uploaded again, succeeded portraits survive partial failure, and missing-only Retry does not repeat completed items.
 
-The controlled 429 transport test invokes `defineStyle`, receives one HTTP 429, observes exactly one `POST /v1beta/interactions`, and returns `QUOTA_EXCEEDED`. It proves no transport retry and no automatic image-model fallback. Files transport is separately asserted as exactly its two documented resumable requests.
+Transport-level Gemini tests bind only a controlled local server. They assert the official Files and Interactions request shapes, source-document URI reuse without manuscript resending, sequential portrait chaining, a fresh Stage V request with relevant portrait references, JPEG output requests with defensive PNG/JPEG/WebP parsing, current token-usage fields, and safe typed errors. The controlled HTTP 429 case produces exactly one interaction request and no automatic retry or fallback. These are compatibility tests, not a real Gemini run.
 
-Additional coverage includes upload/book/style resume boundaries, user art direction with no style-generation call, malformed JSON, zero adults, child output, three characters, short prompts, two chapters, unknown cast references, PNG/JPEG/WebP validation, malformed/mismatched/oversized/no-image output, path traversal, foreign-owner 404s, partial portrait preservation, missing-only retry, reconciliation without another gateway call, stale artifact rejection, and immediate stale-runner spend cutoff.
+Frontend coverage includes API/schema errors, initial unauthenticated routing, expired-session cache clearing without loops, identity and sign-out success/failure, Library states, exact paste/multipart project creation, authoritative persisted Studio states, conditional polling, stale mutation reconciliation, explicit Retry/Recover, manuscript behavior, per-item portraits, and authenticated artifact URLs.
 
-Final root verification:
+## Final command output
+
+The original workspace was reinstalled with `GEMINI_API_KEY= npm ci`, then verified with `GEMINI_API_KEY= ./test.sh`:
 
 ```text
 npm run typecheck
-All 3 workspaces passed.
+Contracts, frontend, and backend passed.
 
 npm run lint
-All 3 workspaces passed with 0 errors and 0 warnings.
+Contracts, frontend, backend, and operational scripts passed.
 
 npm test
-Frontend: 3 files passed, 6 tests passed.
-Backend: 13 files passed, 83 tests passed.
+Frontend: 10 files passed, 38 tests passed.
+Backend: 16 files passed, 106 tests passed.
+Total: 26 files passed, 144 tests passed.
 
 npm run build
-Contracts, Vite frontend, and Fastify backend production builds passed.
+Contracts passed.
+Vite 8.2.1 transformed 263 modules and built frontend/dist.
+TypeScript built backend/dist.
+
+npm audit --omit=dev
+found 0 vulnerabilities
+
+npm audit
+found 0 vulnerabilities
+
+Built-server smoke passed at http://127.0.0.1:62960
+Phase 5 verification passed.
 ```
 
-The final built-runtime smoke started `backend/dist/server.js` with an explicitly empty `GEMINI_API_KEY`, isolated temporary `DATA_DIR`/`DATABASE_PATH`, and loopback binding. `GET /api/health` returned `{"status":"ok"}`; the temporary runtime directory was then removed. An earlier keyless smoke also created a temporary session/project and confirmed Stage I returned `GEMINI_NOT_CONFIGURED` without provider work.
+The smoke checked compatibility health, liveness, readiness, `/library`, `/volumes/new`, a direct `/volumes/<id>` route, JSON-only unknown `/api/**` handling, and private-data non-exposure. The server used an isolated temporary database/data directory and was terminated and cleaned by the script trap.
 
-Paid end-to-end Gemini image generation is intentionally not part of this keyless test gate.
+## Clean-room rehearsal
+
+A temporary directory was created with `mktemp -d`. `rsync -a` copied the source while explicitly retaining `.env.example` and excluding `.git`, local `.env` variants, every `node_modules`, `data`, SQLite/WAL/SHM files, build output, TypeScript build info, and temporary files. The pre-install audit found no Git metadata, local environment, runtime data, build output, database, or Google-key-shaped value; confirmed executable bits on `start.sh` and `test.sh`; and asserted that every Phase 6 deliverable was present.
+
+Actual result:
+
+```text
+Final clean-room pre-install hygiene and deliverable checks passed.
+npm ci: added 533 packages; found 0 vulnerabilities.
+Frontend: 10 files, 38 tests passed.
+Backend: 16 files, 106 tests passed.
+Production and full audits: 0 vulnerabilities.
+Built-server smoke passed at http://127.0.0.1:49596.
+Explicit second built-server smoke passed at http://127.0.0.1:49627.
+Final clean-room install, full gate, and explicit built-server smoke passed.
+Final clean-room temporary directory removed.
+```
+
+npm 11 emitted an `allow-scripts` review warning for native/build dependencies, but the clean install, SQLite-backed tests, production builds, and both smoke runs completed successfully. No repository or npm configuration was changed in response.
+
+The final filename-only hygiene scan found that the built visual start had initialized an empty local `data/` database plus WAL/SHM sidecars. Read-only counts confirmed zero users, projects, sessions, characters, and chapters. The generated directory was moved to recoverable temporary quarantine outside the repository. The repeated scan found only `.env.example`; no key- or cookie-shaped value, private runtime file/directory, deployment configuration, stale Next/vinext/Worker filename, simulated frontend copy, or broken local Markdown link. Ignored `backend/dist`, `frontend/dist`, and `packages/contracts/dist` remained as expected local build output.
+
+## Visual and manual checks
+
+The final capture ran against the built Fastify server at `http://127.0.0.1:63001` using an existing local Chromium shell. It regenerated 15 screenshots at `1440×1000` and `390×844` and passed 41/41 assertions with:
+
+```text
+application console errors: 0
+page errors: 0
+unexpected failed requests: 0
+external/provider requests: 0
+stage manuscript refetches: 0
+duplicate stage-detail reconciliation: 0
+recovery manuscript/detail refetches: 0
+```
+
+Desktop Library/Studio and mobile Studio captures were inspected manually with no Phase 6 visual change. Pixelmatch compared all 15 files: maximum different-pixel ratio `0.8328350953943371`, mean ratio `0.18251781632708175`, and mean aligned absolute color delta `6.908033954689597`. The raw comparison is against the original pre-server baseline and includes approved Phase 4 content removal, changed persisted values, rasterization, and recorded scroll offsets; it is evidence for inspection, not a zero-difference CI threshold.
+
+## Deliberate omissions
+
+The normal gate does not download a browser or run screenshots. Audits may contact npm, but application tests use no provider network. The suite does not prove multi-host operation, exactly-once upstream billing across process death, automatic remote-context rebuilding, public authentication, or public deployment because those are outside the local assignment. Static prototype-image provenance requires candidate confirmation.
+
+## Real Gemini UAT — blocked
+
+A successful real end-to-end image run has **not** occurred. The candidate’s official Book Illustration notebook preflight verified key access, source upload, book context, style generation, and structured character extraction. The first image request returned HTTP 429 because the account reported free-tier image quota `0`; real portraits and the final illustration were not produced.
+
+Therefore fake integration and local transport results must not be described as real Gemini success. Submission readiness remains blocked until the candidate obtains billing/model access and personally completes the bounded checklist in `docs/submission-checklist.md`, then records only redacted, factual results here.

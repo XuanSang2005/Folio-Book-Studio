@@ -1,113 +1,123 @@
 # Gradion Folio Book Studio
 
-An editorial book-illustration studio migrated from the approved vinext UI to a local npm workspace. The Phase 4 frontend now uses the persistent Fastify APIs for identity sessions, projects, manuscripts, the five-stage pipeline, and authenticated artifacts while preserving the approved visual system. The backend provides the Phase 3 Gemini pipeline, private local artifacts, structured validation, provider-operation provenance, and owner-scoped artifact delivery behind the existing Phase 2 state machine.
+Gradion Folio is a local editorial studio that turns one plain-text manuscript into a visual style, a cast of up to two adults, one portrait per character, one chapter brief, and one final illustration. Every stage is started manually, persisted in SQLite, and recoverable without discarding completed work.
 
-## Architecture
+The approved vinext prototype was migrated without redesign to React, Vite, TypeScript, Tailwind, TanStack Router, and TanStack Query. Fastify, Zod, SQLite, and a private local filesystem provide the backend. Shared browser-safe contracts live in `packages/contracts`.
+
+## Prerequisites and setup
+
+- Node.js 22.23.2 or newer
+- npm 10 or newer
+- A Gemini API key with access and paid image quota for real generation
+
+```bash
+npm ci
+cp .env.example .env
+# Edit .env and set GEMINI_API_KEY for a manual real-provider run.
+./start.sh
+```
+
+Open **http://127.0.0.1:3001**. The application and all deterministic tests also boot with `GEMINI_API_KEY=` so reviewers can inspect the UI without spending quota; generation then fails safely with `GEMINI_NOT_CONFIGURED`.
+
+Run the complete keyless verification gate with:
+
+```bash
+./test.sh
+```
+
+For Vite hot reload, use `npm run dev`; the frontend runs at `http://localhost:3000`, proxies `/api`, and the backend remains at `http://127.0.0.1:3001`.
+
+## Environment
+
+The backend reads the repository-root `.env`; explicit process variables take precedence.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `NODE_ENV` | `development` | Runtime mode; `start.sh` uses production composition |
+| `HOST` | `127.0.0.1` | Bind address; production validation permits loopback only |
+| `PORT` | `3001` | Fastify port |
+| `LOG_LEVEL` | `info` | Structured log level |
+| `DATABASE_PATH` | `./data/folio.sqlite` | Private SQLite database |
+| `DATA_DIR` | `./data` | Private manuscript and generated-image root |
+| `GEMINI_API_KEY` | empty | Backend-only key; optional at boot, required for real generation |
+| `GEMINI_TEXT_MODEL` | `gemini-3.6-flash` | Text/context model |
+| `GEMINI_IMAGE_MODEL` | `gemini-3.1-flash-image` | Portrait and illustration model |
+| `GEMINI_REQUEST_TIMEOUT_MS` | `120000` | One provider-request timeout |
+| `STEP_LEASE_MS` | `180000` | Running-step lease |
+| `HEARTBEAT_MS` | `30000` | Lease extension; must be less than half the lease |
+| `SESSION_TTL_SECONDS` | `604800` | Local session lifetime |
+| `MAX_SOURCE_BYTES` | `5242880` | Manuscript byte limit |
+| `MAX_IMAGE_BYTES` | `15728640` | Generated-image byte limit |
+| `COOKIE_NAME` | `folio_session` | Session cookie name |
+
+Never commit `.env` or place a key in frontend code. Health responses and logs expose no secret values.
+
+## Architecture and five-stage flow
 
 ```text
-Gradion-Folio-Book-Studio/
-├── frontend/   React + Vite + TypeScript + Tailwind + TanStack Router
-├── backend/    Node.js + Fastify + TypeScript + Zod + SQLite
-├── packages/   shared API contracts and canonical pipeline constants
-├── docs/       migration baseline, behavior inventory, and comparison
-├── data/       ignored private runtime database, manuscripts, and generated artifacts
-├── package.json
-└── package-lock.json
+Browser ──same-origin API──> Fastify ──> SQLite
+                                  ├────> private data/ filesystem
+                                  └────> Gemini, only when configured
 ```
 
-The frontend uses TanStack Query as its server-state boundary and TanStack Router loaders for cookie-session restoration and protected-route redirects. It does not store authoritative identity, project, manuscript, step, or artifact state in localStorage. New Volume form values remain component-local until one explicit create request succeeds.
+Fastify serves `frontend/dist` and `/api` from one loopback origin. SQLite owns identities, project/step facts, attempts, leases, fences, and artifact associations. The filesystem owns canonical source and image bytes. See [docs/architecture.md](docs/architecture.md) for the state, concurrency, and provider-context diagrams.
 
-The backend exposes health, assessment identity sessions, owner-scoped projects, and authenticated manuscript retrieval. SQLite uses WAL, foreign keys, a busy timeout, and versioned migrations. Canonical manuscripts are stored privately under `data/users/<userId>/projects/<projectId>/source/book.txt`; `data/` is never exposed as static content.
+| Stage | Persisted result | Provider-context rule |
+| --- | --- | --- |
+| I. Style | selected/generated style | upload source and create book context once |
+| II. Characters | one or two validated adults | continue from stored text interaction |
+| III. Portraits | one independently persisted image per adult | sequential image context; retry only missing items |
+| IV. Chapters | exactly one validated chapter brief | continue from stored character text context |
+| V. Illustrations | exactly one final image | fresh call with style, chapter, and relevant local portraits |
 
-Identity is email-based continuity for the local assessment: returning with the same normalized email restores the same user and projects and updates the saved display name. It does not verify that the person owns that email address and is not production authentication.
+The server—not the UI—enforces a maximum of **two adult characters** and **one chapter**. Later stages do not resend the manuscript.
 
-Phase 2's owner-scoped run/recover routes, short atomic SQLite claims, durable attempts, leases, heartbeat extension, attempt fencing, and explicit retry/recovery remain intact. Phase 3 adds a deterministic fake full pipeline, versioned prompts, server-side character/chapter rules, strict PNG/JPEG/WebP persistence, per-call provider-operation records, and a native-fetch `GoogleGeminiGateway` with one attempt per request, explicit timeouts, standard service tier, and no model fallback.
+## Persistence, Retry, and Recover
 
-When `GEMINI_API_KEY` is absent, the server starts normally and generation persists a safe `GEMINI_NOT_CONFIGURED` failure. When it is set in the backend environment, runtime composition selects the real gateway and fenced executor. The key is never part of frontend code, DTOs, health responses, or logs. The adapter has been verified only against controlled local HTTP transport tests: paid end-to-end Gemini image UAT is not complete because the candidate's project currently has free-tier image quota `0`.
+Project state survives refresh, sign-out, backend restart, and a second tab. An atomic SQLite claim allows one live attempt for the first incomplete stage. A concurrent duplicate returns the existing running state without invoking Gemini again. Every checkpoint is fenced by its active attempt ID so an abandoned runner cannot publish late data.
 
-Phase 4 replaces the former `DemoStore`, browser generation timers, seed projects, and generated-artifact fixture mappings. Library summaries come from the owner-scoped API; Studio derives the active stage from the five persisted step DTOs, polls only while a run is pending or a server step is visibly running, and keeps Retry and Recover as separate manual actions.
+A provider or validation failure becomes a persisted failed step. **Retry** is the only action that starts another attempt; neither the application nor transport retries automatically, and there is no automatic model fallback. A running step whose lease expires is shown as stuck. **Recover** abandons that attempt and changes it to a failed, retryable state without making a provider call. If Gemini accepted a request immediately before process death, a later explicit retry may still incur another provider operation; local fencing cannot guarantee exactly-once upstream billing.
 
-## Requirements
+## Local data, privacy, and imagery
 
-- Node.js 22.23.2 or newer (the verified Node 22 minimum for the pinned SQLite driver)
-- npm 10 or newer
+Runtime data is ignored and private:
 
-## Run locally
-
-```bash
-npm install
-npm run dev
+```text
+data/
+├── folio.sqlite
+└── users/<userId>/projects/<projectId>/
+    ├── source/book.txt
+    ├── portraits/
+    └── illustrations/
 ```
 
-Local configuration is read from the repository-root `.env` when present, while explicit shell variables take precedence. Runtime data defaults to the ignored repository-root `data/` directory. The application is designed for a single-host, localhost-only HTTP runtime; it does not require or include Docker.
+Manuscripts and generated images are never static files. Authenticated owner-scoped API routes stream artifacts after path and byte validation. Session cookies are opaque, finite-lived, HttpOnly, `SameSite=Lax`, scoped to `/`, and Secure only when HTTPS is actually used.
 
-The workspace starts:
+When real generation is enabled, manuscript content is uploaded to Google’s Files API and used by the Interactions API. Use short public-domain, non-sensitive text and review provider retention for the selected account/tier. The default models are `gemini-3.6-flash` and `gemini-3.1-flash-image`; alternatives require an explicit environment override and are never selected as fallback.
 
-- Frontend: `http://localhost:3000`
-- Backend: `http://127.0.0.1:3001`
-- Proxied health check: `http://localhost:3000/api/health`
+The decorative images in `frontend/public/illustrations/` came from the approved pre-migration prototype and remain visual fixtures, not proof of a successful current provider run. Per-file source/license or generation provenance is not recorded in this repository and must be confirmed by the candidate before submission. New project portraits and final illustrations are attributable to the configured Gemini model through persisted provider-operation metadata.
 
-Backend routes through Phase 3:
+## Local-only delivery
 
-- `POST`, `GET`, and `DELETE /api/session`
-- `GET` and `POST /api/projects`
-- `GET /api/projects/:projectId`
-- `GET /api/projects/:projectId/manuscript`
-- `POST /api/projects/:projectId/steps/:ordinal/run`
-- `POST /api/projects/:projectId/steps/:ordinal/recover`
-- `GET /api/projects/:projectId/characters/:characterId/portrait`
-- `GET /api/projects/:projectId/chapters/:chapterId/illustration`
+There is no Docker configuration and no public deployment. Docker would add packaging and filesystem/SQLite ownership complexity without improving this required single-host workflow. Horizontal operation would require a shared database, object storage, and durable job coordination; the repository does not claim those properties. Any previously hosted prototype must be decommissioned manually by the candidate and is not part of this submission.
 
-The run endpoint returns `200` after a successful fake execution (or for an already-succeeded step), `202` for a duplicate request while the current lease is live, and typed `409` errors for out-of-order or expired-running requests. Only the first incomplete step can be claimed. A failed step is retried only by another explicit run request; there is no automatic execution retry.
+## Health and troubleshooting
 
-Steps store only `pending`, `running`, `succeeded`, and `failed`. `stuck` is a derived DTO state for a running step whose lease has expired. Recovery is a separate zero-execution action: it abandons the expired attempt, records `PROCESS_INTERRUPTED`, clears its fence/lease, resets only in-progress item checkpoints, and preserves succeeded steps and items.
+- `GET /api/health` — compatibility health
+- `GET /api/health/live` — process liveness
+- `GET /api/health/ready` — SQLite, migrations, writable data directory, and non-secret `geminiConfigured`
 
-Attempt IDs are private fencing tokens. Heartbeats, checkpoints, and terminal writes update only the matching active attempt. This prevents a late result from an abandoned process from replacing newer state, but it is not a distributed exactly-once guarantee. Process-local foreground work does not survive server death. If a future real provider accepts a request and the process dies before its response is durably checkpointed, an explicit later retry may issue another provider operation.
+Common failures:
 
-Each provider sub-call is its own fenced operation. Source upload, book context, generated style, character extraction, image context, each portrait, chapter extraction, and final illustration checkpoint independently. Completed remote context and artifacts are reused on explicit retry; expired required provider context returns `CONTEXT_EXPIRED` rather than silently spending calls to rebuild it. Provider operations store model/prompt provenance, symbolic context ownership, request IDs, safe usage/timing data, and typed failures—never prompts, manuscript text, API keys, cookies, base64 images, or raw upstream bodies.
+- **Missing key:** the server still starts; generation records `GEMINI_NOT_CONFIGURED`. Add the key only to local `.env`, restart, then explicitly Retry.
+- **Billing/model access:** `MODEL_ACCESS_DENIED` or related failures mean the configured project/model is unavailable. Confirm billing and model access; do not expect fallback.
+- **Quota HTTP 429:** `QUOTA_EXCEEDED` persists after one provider attempt. Wait or add quota, then click Retry; no automatic request is made.
+- **Expired provider context:** `CONTEXT_EXPIRED` preserves local work and does not silently upload/regenerate. This core submission has no automatic rebuild action.
+- **Stuck step:** wait for lease expiry, click Recover, then click Retry. Recover itself performs no generation.
+- **Native SQLite install:** use a supported Node version and rerun `npm ci`; do not switch database implementations.
 
-Generated images are stored with server-owned attempt-specific names below `data/users/<userId>/projects/<projectId>/portraits|illustrations/`. Writes use a private temporary file, flush, and atomic rename. Database associations contain only relative paths plus MIME, size, and SHA-256 metadata. Artifact routes perform the owner check before reading, revalidate path containment and stored bytes, use `nosniff`, and return private immutable cache headers. Crash-orphaned files may remain on disk, but they are never reachable without a valid fenced association.
+## Verification status
 
-The backend sends manuscript content to Google's Files and Interactions APIs only when the real adapter is explicitly configured and Stage I is run. Treat provider Files/interactions as expiring cache and local source/artifacts as durable truth. Use public-domain, non-sensitive assessment text; Google retention varies by resource and account/tier.
+Implementation and deterministic verification are complete for the required local, single-host runtime: the keyless suite passes 144 tests, both npm audits report zero vulnerabilities, the built-server smoke covers direct SPA routes and private-data isolation, and the Playwright record contains 15 screenshots with 41/41 assertions and no external/provider request. See [TESTING.md](TESTING.md) and [docs/submission-checklist.md](docs/submission-checklist.md).
 
-Session cookies are opaque, finite-lived, HttpOnly, `SameSite=Lax`, and scoped to `/`. Only a SHA-256 token hash is stored in SQLite. Cookies intentionally omit `Secure` for the documented localhost HTTP runtime.
-
-The application routes are:
-
-- `/login`
-- `/library`
-- `/volumes/new`
-- `/volumes/$volumeId`
-
-Direct navigation, cookie-session restoration, dialogs, upload/paste behavior, persisted pipeline states, authenticated artifact URLs, Retry, and Recover are covered by focused frontend tests and the intercepted-API Playwright capture.
-
-## Verification
-
-```bash
-npm run typecheck
-npm run lint
-npm test
-npm run build
-```
-
-The root scripts run all workspaces. Frontend tests cover typed API parsing, session guards and cache isolation, Library states, exact paste/multipart creation, persisted Studio states, conditional polling, explicit Retry/Recover, real artifact URLs, and manuscript dialog states. Backend tests use isolated temporary databases and file roots for migrations, constraints, sessions, owner scoping, source/image validation, compensation, two-instance concurrency, fencing, recovery, partial checkpoints, restart persistence, and all five fake stages. Provider transport tests bind a controlled loopback HTTP server; they require no Gemini key, never contact Google, and prove that a 429 causes exactly one outgoing adapter request.
-
-Project creation validates and canonicalizes the complete source before visibility, writes through a flushed sibling temporary file and atomic rename, then inserts the project and its five pending stages in one immediate SQLite transaction. An ordinary database failure removes the new project directory. A process crash can leave an unreferenced orphan directory, but cannot expose a database project pointing at a partially written source; orphan reconciliation is intentionally deferred beyond Phase 1.
-
-## Visual regression evidence
-
-The accepted pre-migration screenshots are committed in `docs/baseline/before/`; migrated screenshots live in `docs/baseline/after/`. Both use `1440 × 1000` desktop and `390 × 844` mobile viewports. See `docs/baseline/behavior.md` for the interaction inventory and `docs/baseline/comparison.json` for the image comparison report.
-
-Playwright remains a root development dependency because the capture is reusable regression coverage. The current harness intercepts same-origin `/api` requests with deterministic session/project/pipeline fixtures; it does not restore production seed mode, require an API key, or contact Gemini. Install its local Chromium binary once if needed:
-
-```bash
-npx playwright install chromium
-npm run visual:after
-npm run visual:compare
-```
-
-Set `PLAYWRIGHT_EXECUTABLE_PATH` to reuse an existing Chromium executable. The capture intentionally uses `http://localhost:3000`; this also supports the legacy baseline server's IPv6 localhost binding.
-
-## Styling migration boundary
-
-Tailwind is active in the Vite pipeline with the approved palette, typography, spacing, and shadow tokens. Utilities are used for new structural wrappers and route-level fallback UI. The parity-sensitive custom stylesheet remains in place so the migration does not redesign or simplify the approved interface; sections can be converted incrementally only after screenshot verification.
+Submission remains blocked pending a successful paid Gemini portrait/final-image UAT. The candidate’s official-notebook preflight reached text generation, but the first image request returned HTTP 429 with free-tier image quota `0`. No successful paid portrait or final-image result is claimed.

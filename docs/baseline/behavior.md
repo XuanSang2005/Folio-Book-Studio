@@ -1,5 +1,7 @@
 # Approved UI migration baseline
 
+> Historical scope: the DemoStore, localStorage, and simulated-pipeline sections below describe the pre-migration baseline and are intentionally absent from the current production runtime. Current server-backed verification is recorded later in this document.
+
 Captured from the vinext application at `http://localhost:3000` before the monorepo migration.
 
 ## Viewports and evidence

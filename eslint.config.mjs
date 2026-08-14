@@ -31,7 +31,7 @@ export default defineConfig([
     },
   },
   {
-    files: ["backend/**/*.ts", "frontend/vite.config.ts"],
+    files: ["backend/**/*.ts", "frontend/vite.config.ts", "scripts/**/*.mjs"],
     languageOptions: {
       globals: globals.node,
     },

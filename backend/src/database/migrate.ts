@@ -3,11 +3,22 @@ import { initialMigration } from "./migrations/001-initial.js";
 import { pipelineAttemptsMigration } from "./migrations/002-pipeline-attempts.js";
 import { providerOperationsMigration } from "./migrations/003-provider-operations.js";
 
-const migrations = [
+export const migrations = [
   initialMigration,
   pipelineAttemptsMigration,
   providerOperationsMigration,
 ] as const;
+
+export const CURRENT_MIGRATION_VERSION = migrations.at(-1)?.version ?? 0;
+
+export function migrationsAreCurrent(database: Database.Database): boolean {
+  if (!database.open) return false;
+  const applied = database.prepare(`
+    SELECT version FROM schema_migrations ORDER BY version
+  `).all() as Array<{ version: number }>;
+  return applied.length === migrations.length
+    && applied.every(({ version }, index) => version === migrations[index]?.version);
+}
 
 export function runMigrations(database: Database.Database): void {
   database.exec(`

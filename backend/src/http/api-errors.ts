@@ -34,10 +34,18 @@ function envelope(error: ApiError): ApiErrorEnvelope {
   };
 }
 
-export function registerSafeErrorHandling(app: FastifyInstance): void {
+export function registerSafeErrorHandling(
+  app: FastifyInstance,
+  options: { spaFallback?: boolean } = {},
+): void {
   app.setNotFoundHandler(async (request, reply) => {
-    if (request.url.startsWith("/api/")) {
+    const pathname = request.url.split("?", 1)[0];
+    if (pathname === "/api" || pathname.startsWith("/api/")) {
       return reply.code(404).send(envelope(new ApiError(404, "NOT_FOUND", "Resource not found.")));
+    }
+    if (options.spaFallback && ["GET", "HEAD"].includes(request.method)) {
+      reply.header("Cache-Control", "no-cache, no-store, must-revalidate");
+      return reply.type("text/html; charset=utf-8").sendFile("index.html");
     }
     return reply.code(404).send({ message: "Not Found" });
   });

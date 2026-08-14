@@ -102,6 +102,10 @@ export class FakeHeartbeatScheduler implements HeartbeatScheduler {
   tick(): void {
     for (const callback of [...this.callbacks]) callback();
   }
+
+  close(): void {
+    this.callbacks.clear();
+  }
 }
 
 export type FakeStepCall = {

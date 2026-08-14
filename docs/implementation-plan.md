@@ -1,10 +1,10 @@
 # Folio Book Studio — Production Implementation Plan
 
-> Status: approved UI/workspace migration and Phases 1–4 complete; the frontend API cutover is verified, the real provider adapter is transport-tested, and paid image UAT remains deferred.
+> Status: Phases 1–5 implementation and the Phase 6 deliverable/clean-room pass are complete for the required local, single-host runtime. Submission remains blocked pending a successful paid Gemini portrait/final-image UAT and candidate-owned Git/provenance actions.
 >
 > Last reviewed: 2026-08-14.
 >
-> Target: production-ready **for the assessment's local, single-host runtime**, with explicit seams for future horizontal scale. The goal is not to imitate a distributed cloud system inside a 16-hour take-home.
+> Target: implementation and deterministic verification are complete **for the assessment's local, single-host runtime**, with explicit seams for future horizontal scale. Submission remains blocked pending a successful paid Gemini portrait/final-image UAT.
 
 ## 1. Executive summary
 
@@ -17,7 +17,7 @@ The repository already has a strong product shell:
 - desktop/mobile visual baselines and 41 interaction assertions
 - clean workspace-level typecheck, lint, tests, and production builds
 
-The accepted browser experience is now server-backed. TanStack Query owns cached API data, route loaders restore the HttpOnly cookie session before protected content renders, and the former `DemoStore`, localStorage snapshot, generation timers, seed projects, and generated-artifact mappings have been removed from production. The backend remains authoritative for durable sessions, projects, manuscripts, the Phase 2 state machine, and the Phase 3 five-stage provider/artifact implementation. The real adapter is composed only for a backend key and is verified against a controlled local transport; a billed end-to-end image run remains pending. Phase 5 release hardening has not started.
+The accepted browser experience is now server-backed. TanStack Query owns cached API data, route loaders restore the HttpOnly cookie session before protected content renders, and the former `DemoStore`, localStorage snapshot, generation timers, seed projects, and generated-artifact mappings have been removed from production. The backend remains authoritative for durable sessions, projects, manuscripts, the Phase 2 state machine, and the Phase 3 five-stage provider/artifact implementation. Fastify now serves the built SPA and API from one loopback origin with typed API-only 404s, security headers, origin validation, redacted logs, readiness, and graceful shutdown. The real adapter is composed only for a backend key and is verified against a controlled local transport; a billed end-to-end image run remains pending. Phase 6 has finalized the reviewer documents, AI-evidence index, hygiene audit, visual record, and no-Git clean-room rehearsal without claiming provider success.
 
 The implementation order is deliberate:
 
@@ -26,7 +26,7 @@ The implementation order is deliberate:
 3. Prove ordering, duplicate prevention, retry, and recovery with a fake provider.
 4. Implement the real Gemini pipeline behind the same provider interface.
 5. Replace the demo store with typed server state without redesigning the UI.
-6. Harden local operation, produce the required evidence, and run one bounded real pipeline.
+6. Harden local operation, produce the required evidence, rehearse from a clean copy, and keep the bounded real-pipeline gate explicitly blocked until paid image quota is available.
 
 The most important engineering signal is not the number of abstractions. It is that concurrency and recovery behavior are written as invariants and proven by tests.
 
@@ -50,9 +50,9 @@ The most important engineering signal is not the number of abstractions. It is t
 - Book text and generated images live on the private local filesystem and are served through owner-checked API routes.
 - One command starts the full local product; one command verifies it without an API key.
 
-### 2.2 Definition of “production-ready” for this repository
+### 2.2 Definition of complete local implementation for this repository
 
-Production-ready here means:
+Complete implementation and deterministic verification for the local, single-host runtime mean:
 
 - strict runtime configuration validation
 - durable migrations and restart-safe state
@@ -119,8 +119,7 @@ flowchart LR
     API --> Sessions["Session service"]
     API --> Projects["Project service"]
     API --> Pipeline["Pipeline service"]
-    Pipeline --> Dispatcher["In-process dispatcher"]
-    Dispatcher --> Runner["Fenced stage runner"]
+    Pipeline --> Runner["Fenced step executor awaited by winning Run request"]
     Sessions --> DB[(SQLite)]
     Projects --> DB
     Pipeline --> DB
@@ -135,12 +134,13 @@ flowchart LR
 
 - Development: Vite on `localhost:3000`, Fastify on `127.0.0.1:3001`, Vite proxies `/api`.
 - Local release: Fastify serves `frontend/dist` and `/api` from one loopback origin with SPA fallback.
-- Pipeline run requests return `202 Accepted` after an atomic claim; an in-process dispatcher performs provider work independently of the browser request lifecycle.
-- The frontend polls project detail only while a step is running.
-- Browser refresh does not cancel the in-process run.
-- Process death stops in-flight foreground provider work. The persisted lease eventually exposes a stuck step; explicit recovery and retry continue without deleting completed artifacts.
+- A winning Run request atomically claims the first incomplete step, commits that short transaction, then awaits the fenced step executor while provider work occurs outside SQLite transactions.
+- After successful execution and publication, the winning request returns `200` with the updated project. A duplicate request that observes the live running lease returns `202` with the running project and makes no provider call.
+- The frontend polls project detail while the Run mutation is pending or persisted state remains running.
+- Refresh or navigation is not intentionally passed as a cancellation signal to Gemini, but execution is still foreground, process-local work owned by the winning request handler.
+- Server process death does not preserve in-flight provider execution. Lease expiry exposes the persisted step as stuck; explicit Recover abandons it without generation, and explicit Retry creates the next attempt without deleting completed artifacts.
 
-This is deliberately stronger than a long browser-held POST and much smaller than introducing an external queue.
+This keeps expensive work outside database transactions while deliberately avoiding a background dispatcher or external queue. The accepted limitation is that the winning HTTP request remains open until execution succeeds or fails.
 
 ### 5.2 Proposed repository shape
 
@@ -188,17 +188,21 @@ Gradion-Folio-Book-Studio/
 
 ### 5.3 Dependency injection boundary
 
-`buildApp` must accept a small service container:
+`buildApp` accepts an injected application-dependency container. The execution-related portion is:
 
 ```ts
-type Services = {
-  config: AppConfig;
-  database: Database;
-  files: LocalFileStore;
+type ApplicationDependencies = {
+  config: Environment;
+  database: DatabaseConnection;
+  localFiles: SourceFileStore;
+  artifactFiles: ArtifactFileStore;
   gemini: GeminiGateway;
   clock: Clock;
   ids: IdGenerator;
-  dispatcher: PipelineDispatcher;
+  attemptIds: AttemptIdGenerator;
+  heartbeatScheduler: HeartbeatScheduler;
+  stepExecutor: StepExecutor;
+  // sessionTokens is also injected for identity/session work.
 };
 ```
 
@@ -783,9 +787,9 @@ Safe log context includes request ID, hashed/user-safe identifier, project ID, s
 
 - Liveness checks process responsiveness only.
 - Readiness checks DB, migrations, writable data directory, and reports `geminiConfigured` without spending quota.
-- Fastify `onClose` drains/stops the dispatcher and closes SQLite.
+- Fastify shutdown stops accepting new requests; its `onClose` hook closes active heartbeat timers and SQLite. There is no dispatcher to drain.
 - SIGINT/SIGTERM stop new claims and wait a bounded grace period.
-- A killed worker relies on persisted lease expiry and explicit recovery.
+- A killed server process relies on persisted lease expiry, explicit Recover, and explicit Retry.
 
 ### 12.4 Observability
 
@@ -930,7 +934,7 @@ Implementation status: complete. Its gate used deterministic fake execution and 
 Tasks:
 
 - Implement atomic claim transaction and step derivation.
-- Add attempts, leases, heartbeat, fencing, dispatcher, recovery, and item reconciliation.
+- Add attempts, leases, heartbeat, foreground fenced execution, recovery, and item reconciliation. No background dispatcher was delivered.
 - Write concurrency/restart/failure/recovery tests before provider code.
 - Use the fake provider only.
 
@@ -1006,7 +1010,7 @@ Go/no-go checkpoint: UI must be server-backed by roughly hour 13. Stop nonessent
 
 Recommended commit: `feat: connect the accepted UI to persistent APIs`.
 
-### Phase 5 — Local release and security hardening (about 1–1.5 hours)
+### Phase 5 — Local release and security hardening (complete 2026-08-14)
 
 Tasks:
 
@@ -1026,7 +1030,7 @@ Definition of done:
 
 Recommended commit: `chore: harden local runtime and reviewer commands`.
 
-### Phase 6 — Documentation, real UAT, and submission rehearsal (about 1.5–2 hours)
+### Phase 6 — Documentation, real UAT, and submission rehearsal (deliverables/rehearsal complete 2026-08-14; paid portrait/final-image UAT blocked)
 
 Tasks:
 
@@ -1106,7 +1110,7 @@ Do not implement these for the take-home. Preserve only the boundaries that make
 | High provider volume | bounded product caps | project quotas, concurrency semaphore, rate limits |
 | Multi-service diagnostics | structured logs/attempt records | OpenTelemetry traces + metrics backend |
 
-The migration sequence would be database/storage/dispatcher adapters first; API DTOs, frontend queries, domain invariants, and stage handlers remain stable.
+The scale-out migration sequence would replace database/storage adapters and add durable job coordination first; API DTOs, frontend queries, domain invariants, and stage handlers remain stable.
 
 ## 17. Risks and mitigations
 
@@ -1130,21 +1134,21 @@ The product is ready for submission when all are true:
 
 - [ ] Notebook steps 1–5 were personally run and mapped.
 - [x] No production user/project/pipeline state comes from `localStorage` or sample fixtures.
-- [ ] SQLite and private files survive restart.
-- [ ] Every API resource is owner-scoped.
-- [ ] Five stages are server-enforced, ordered, and capped.
-- [ ] Concurrent duplicate requests produce one provider operation sequence.
-- [ ] Failure, retry, stuck recovery, fencing, and partial portraits are tested.
-- [ ] Gemini source context is created once and reused.
-- [ ] Automatic provider retries and automatic model fallback are disabled.
-- [ ] Generated artifacts are validated and streamed through private API routes.
-- [ ] Existing UI covers empty/loading/running/error/stuck/complete states accessibly.
-- [ ] `./start.sh` starts the complete local app.
-- [ ] `./test.sh` passes without a key or network.
-- [ ] One bounded real Gemini run completed and is honestly documented.
-- [ ] README, DECISIONS, TESTING, `.env.example`, and AI artifacts are complete.
-- [ ] Clean-clone rehearsal succeeds.
-- [ ] No secrets, runtime DB/files, or public deployment links are present.
+- [x] SQLite and private files survive restart.
+- [x] Every API resource is owner-scoped.
+- [x] Five stages are server-enforced, ordered, and capped.
+- [x] Concurrent duplicate requests produce one provider operation sequence.
+- [x] Failure, retry, stuck recovery, fencing, and partial portraits are tested.
+- [x] Gemini source context is created once and reused in deterministic/transport verification.
+- [x] Automatic provider retries and automatic model fallback are disabled and transport-tested.
+- [x] Generated artifacts are validated and streamed through private API routes in deterministic integration.
+- [x] Existing UI covers empty/loading/running/error/stuck/complete states accessibly.
+- [x] `./start.sh` starts the complete local app.
+- [x] `./test.sh` passes without a Gemini key or provider network; its required audits may contact the npm registry.
+- [ ] One bounded paid Gemini portrait/final-image UAT completed and is honestly documented.
+- [x] README, DECISIONS, TESTING, `.env.example`, and AI artifacts are complete, subject to candidate wording/transcript/provenance review.
+- [x] No-Git clean-room rehearsal succeeds.
+- [x] The source deliverable contains no detected secrets, runtime DB/files, or public deployment configuration; candidate Git/package review remains required.
 
 ## 19. Suggested commit story (commands remain user-owned)
 

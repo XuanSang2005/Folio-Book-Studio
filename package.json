@@ -17,8 +17,10 @@
     "dev:backend": "npm run build -w @gradion-folio/contracts && npm run dev -w backend",
     "build": "npm run build -w @gradion-folio/contracts && npm run build -w frontend && npm run build -w backend",
     "typecheck": "npm run typecheck -w @gradion-folio/contracts && npm run typecheck -w frontend && npm run typecheck -w backend",
-    "lint": "npm run lint -w @gradion-folio/contracts && npm run lint -w frontend && npm run lint -w backend",
+    "lint": "npm run lint -w @gradion-folio/contracts && npm run lint -w frontend && npm run lint -w backend && eslint scripts",
     "test": "npm run build -w @gradion-folio/contracts && npm test -w frontend && npm test -w backend",
+    "start": "./start.sh",
+    "verify": "./test.sh",
     "visual:before": "node docs/baseline/capture.mjs before",
     "visual:after": "node docs/baseline/capture.mjs after",
     "visual:compare": "node docs/baseline/compare.mjs"
@@ -31,7 +33,9 @@
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "16.4.0",
-    "playwright": "1.55.0",
+    "pixelmatch": "7.2.0",
+    "playwright": "1.62.1",
+    "pngjs": "7.0.0",
     "typescript-eslint": "8.67.0"
   }
 }

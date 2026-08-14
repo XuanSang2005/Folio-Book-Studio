@@ -3,7 +3,7 @@ import {
   type EndSessionResponse,
   type SessionDto,
 } from "@gradion-folio/contracts";
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import {
   createSession,
   deleteSession,
@@ -11,12 +11,14 @@ import {
 } from "../identity/session-service.js";
 import type { ApplicationDependencies } from "../runtime/dependencies.js";
 
-const cookieSettings = {
+function cookieSettings(request: FastifyRequest) {
+  return {
   httpOnly: true,
   sameSite: "lax" as const,
   path: "/",
-  secure: false,
-};
+    secure: request.protocol === "https",
+  };
+}
 
 export async function registerSessionRoutes(
   app: FastifyInstance,
@@ -26,7 +28,7 @@ export async function registerSessionRoutes(
     const input = CreateSessionRequestSchema.parse(request.body);
     const session = createSession(dependencies, input);
     reply.setCookie(dependencies.config.COOKIE_NAME, session.token, {
-      ...cookieSettings,
+      ...cookieSettings(request),
       maxAge: dependencies.config.SESSION_TTL_SECONDS,
       expires: new Date(session.dto.expiresAt),
     });
@@ -39,7 +41,7 @@ export async function registerSessionRoutes(
 
   app.delete("/api/session", async (request, reply): Promise<EndSessionResponse> => {
     deleteSession(dependencies, request.cookies[dependencies.config.COOKIE_NAME]);
-    reply.clearCookie(dependencies.config.COOKIE_NAME, cookieSettings);
+    reply.clearCookie(dependencies.config.COOKIE_NAME, cookieSettings(request));
     return { signedOut: true };
   });
 }

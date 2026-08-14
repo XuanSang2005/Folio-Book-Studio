@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildApp } from "../../src/app.js";
+import type { FastifyServerOptions } from "fastify";
 import { parseEnvironment, type Environment } from "../../src/config/env.js";
 import { openDatabase, type DatabaseConnection } from "../../src/database/database.js";
 import type { ApplicationDependencies } from "../../src/runtime/dependencies.js";
@@ -11,6 +12,7 @@ import {
   type ArtifactFileStore,
 } from "../../src/storage/local-artifact-store.js";
 import { GeminiStepExecutor } from "../../src/pipeline/gemini-step-executor.js";
+import type { ReadinessProbe } from "../../src/routes/health.js";
 import type { SessionTokenGenerator } from "../../src/runtime/session-tokens.js";
 import type { AttemptIdGenerator } from "../../src/runtime/attempt-ids.js";
 import type { HeartbeatScheduler } from "../../src/runtime/heartbeat-scheduler.js";
@@ -57,6 +59,9 @@ export async function createTestHarness(options: {
   heartbeatScheduler?: HeartbeatScheduler;
   stepExecutor?: StepExecutor;
   useGeminiStepExecutor?: boolean;
+  staticRoot?: string;
+  readinessProbe?: ReadinessProbe;
+  serverOptions?: FastifyServerOptions;
 } = {}): Promise<TestHarness> {
   const ownsTemporaryDirectory = options.temporaryDirectory === undefined;
   const temporaryDirectory = options.temporaryDirectory ?? await mkdtemp(join(
@@ -101,7 +106,12 @@ export async function createTestHarness(options: {
       dependencies.stepExecutor = new GeminiStepExecutor(dependencies);
     }
     const stepExecutor = dependencies.stepExecutor;
-    const app = buildApp({ dependencies });
+    const app = buildApp({
+      dependencies,
+      ...(options.staticRoot ? { staticRoot: options.staticRoot } : {}),
+      ...(options.readinessProbe ? { readinessProbe: options.readinessProbe } : {}),
+      ...(options.serverOptions ? { serverOptions: options.serverOptions } : {}),
+    });
     let cleaned = false;
 
     return {
